@@ -1,0 +1,713 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>OpenCV配置——在Visual Studio中使用OpenCV | Yunfeng&#39;s Hexo Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Yunfeng Wang">
+    
+
+    
+    <meta name="description" content="OpenCV是图像领域经常会用到的工具库函数的集合，有C/C++,Java和Python等语言的接口，并且适用于Windows，Linux，Mac OS桌面开发平台和Android 和IOS移动开发平台。目前已经出了1.x系列和2.x系列，3.0 Beta版也已经出了。OpenCV配置起来还是挺费事的，虽然网上已经有很多很全面也很有用的参考文章，我还是打算把自己配置的过程写下来，以后肯定还会配置这">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenCV配置——在Visual Studio中使用OpenCV">
+<meta property="og:url" content="http://vra.github.io/2015/04/22/opencv-vs-config/index.html">
+<meta property="og:site_name" content="Yunfeng's Hexo Blog">
+<meta property="og:description" content="OpenCV是图像领域经常会用到的工具库函数的集合，有C/C++,Java和Python等语言的接口，并且适用于Windows，Linux，Mac OS桌面开发平台和Android 和IOS移动开发平台。目前已经出了1.x系列和2.x系列，3.0 Beta版也已经出了。OpenCV配置起来还是挺费事的，虽然网上已经有很多很全面也很有用的参考文章，我还是打算把自己配置的过程写下来，以后肯定还会配置这">
+<meta property="og:image" content="https://vra.blog.ustc.edu.cn/wp-content/uploads/2015/04/lena.png">
+<meta property="og:updated_time" content="2017-01-08T09:23:44.734Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OpenCV配置——在Visual Studio中使用OpenCV">
+<meta name="twitter:description" content="OpenCV是图像领域经常会用到的工具库函数的集合，有C/C++,Java和Python等语言的接口，并且适用于Windows，Linux，Mac OS桌面开发平台和Android 和IOS移动开发平台。目前已经出了1.x系列和2.x系列，3.0 Beta版也已经出了。OpenCV配置起来还是挺费事的，虽然网上已经有很多很全面也很有用的参考文章，我还是打算把自己配置的过程写下来，以后肯定还会配置这">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Yunfeng&#39;s Hexo Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/author.jpg">
+    
+    
+    <link rel="apple-touch-icon" href="/img/logo.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Yunfeng&#39;s Hexo Blog" title="Yunfeng&#39;s Hexo Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Yunfeng&#39;s Hexo Blog">Yunfeng&#39;s Hexo Blog</a></h1>
+				<h2 class="blog-motto">Life is the process of learning</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					<li>
+						<a href="/atom.xml">RSS</a>
+					</li>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/22/opencv-vs-config/" title="OpenCV配置——在Visual Studio中使用OpenCV" itemprop="url">OpenCV配置——在Visual Studio中使用OpenCV</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Yunfeng Wang" target="_blank" itemprop="author">Yunfeng Wang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-04-22T15:01:24.000Z" itemprop="datePublished"> 发表于 2015-04-22</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#下载OpenCV包"><span class="toc-number">1.</span> <span class="toc-text">下载OpenCV包</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#添加环境变量"><span class="toc-number">2.</span> <span class="toc-text">添加环境变量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#生成独立的OpenCV配置属性表"><span class="toc-number">3.</span> <span class="toc-text">生成独立的OpenCV配置属性表</span></a></li></ol>
+		
+		</div>
+		
+		<p><a href="http://opencv.org/" target="_blank" rel="external">OpenCV</a>是图像领域经常会用到的工具库函数的集合，有C/C++,Java和Python等语言的接口，并且适用于Windows，Linux，Mac OS桌面开发平台和Android 和IOS移动开发平台。目前已经出了1.x系列和2.x系列，3.0 Beta版也已经出了。OpenCV配置起来还是挺费事的，虽然网上已经有很多很全面也很有用的参考文章，我还是打算把自己配置的过程写下来，以后肯定还会配置这个东西，希望到时候有个方便的参考。</p>
+<p>这篇文章记录在Windows平台上，如何安装OpenCV并且在Visual Studio 的C/C++开发环境中使用之。</p>
+<p>我用的是Windows 7，Visual tudio 2012 Ultimate。</p>
+<a id="more"></a>
+<h2 id="下载OpenCV包">下载OpenCV包</h2><p>在<a href="http://opencv.org/downloads.html" target="_blank" rel="external">opencv下载</a> 页面上，下载想要安装的版本。据说3.x系列会修改较多的API名称等，所以建议下载比较新的版本。我下的是2.4.10。下载之后将文件解压。</p>
+<p>解压后会看到看到两个文件夹：<code>build</code>和<code>source</code>，<code>build</code>文件夹下面是已经编译好的库文件和可执行文件，而<code>source</code>文件夹下面是未编译的源文件。我们在写程序时用到的是一些编译好的lib和dll文件，所以只要在程序中添加了头文件，调用了相应的函数，然程序运行时能找到相应的库文件（包括动态库文件即<code>.dll</code>文件和静态库文件，即<code>.lib</code>文件）就可以了。所以针对这个情况，大概做以下几个步骤就可以了。</p>
+<h2 id="添加环境变量">添加环境变量</h2><p>添加环境变量是为了让程序在运行时能找到函数对应的动态链接库（<code>dll</code>）。<strong>要注意的是，OpenCV对于32位程序和64位程序有不同的dll目录，并且对于不同的版本的VS，也有不同的dll文件目录。</strong></p>
+<p>在<code>build</code>目录下，<code>x86</code>下面包含了32位程序所需的<code>dll</code>文件，<code>x64</code>目录下面包含了64位程序所需<code>dll</code>文件。在这个两个目录下，都有<code>vc10</code>,<code>vc11</code>,<code>vc12</code>三个文件夹，分别是针对<code>vs2010</code>,<code>vs2012</code>和<code>vs2013</code>。为了使32位程序和64位程序都能编写通过，我一般将两者目录下的和VS版本对应的文件夹下的<code>bin</code>目录都加入PATH变量中。所以在PATH环境变量中增加如下内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">;D:\program_file\opencv\build\x86\vc11\bin;D:\program_file\opencv\build\x64\vc11\bin</span><br></pre></td></tr></table></figure>
+<p>其中build前面的位置是我安装opencv的目录，安装位置不同前面部分也应改为相应的目录。</p>
+<h2 id="生成独立的OpenCV配置属性表">生成独立的OpenCV配置属性表</h2><p>我们的目标是通过操作生成一个单独的OpenCV配置属性表，然后将其导出保存起来，将来在需要用到OpenCV的程序中，直接导入这个保存的属性表即可。<br>下面几步都是在VS开发环境里面进行。</p>
+<ol>
+<li>创建一个空项目，通过视图-&gt;属性管理器找到属性管理器页面。每个项目都可以有四个编译情况，分别是：<code>Debug|win32</code>、<code>Release|win32</code>、<code>Debug|x64</code>、<code>Release|x64</code>，基本步骤都类似，下面针对<code>Debug|win32</code>来说。</li>
+<li>在<code>Debug|win32</code>文件夹上右击，选择添加新项目属性表，在弹出的对话框里，给这个表取名为OpenCV_Debug_32.props，然后点击添加。</li>
+<li>双击新建的属性表，就会弹出熟悉的MFC复古风格的属性设置页了。</li>
+<li><p>在属性页上，点击C/C++-&gt;常规-&gt;附加库包含目录，在这里添加OpenCV安装路径下的include目录，具体如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">D:\program_file\opencv\build\include</span><br></pre></td></tr></table></figure>
+<p>同样的，build前面是opencv的安装路径，按实际情况选择。</p>
+</li>
+<li><p>在属性页上，点击链接器-&gt;常规-&gt;附加库目录，在这里添加OpenCV安装路径下的lib目录。注意：对不同编译情况和不同版本的VS，lib文件夹目录不同。对于VS2012下面的<code>Debug|win32</code>模式，lib文件夹目录为：</p>
+</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">D:\program_file\opencv\build\x86\vc11\lib</span><br></pre></td></tr></table></figure>
+<p>其中<code>x86</code>目录表示是针对<code>win32</code>的，<code>vc11</code>表示是适用于<code>VS2012</code>的。</p>
+<ol>
+<li><p>在属性页上，点击链接器-&gt;输入-&gt;附加依赖项，在里面添加附加依赖的lib文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">opencv_calib3d2411d.lib</span><br><span class="line">opencv_contrib2411d.lib</span><br><span class="line">opencv_core2411d.lib</span><br><span class="line">opencv_features2d2411d.lib</span><br><span class="line">opencv_flann2411d.lib</span><br><span class="line">opencv_gpu2411d.lib</span><br><span class="line">opencv_highgui2411d.lib</span><br><span class="line">opencv_imgproc2411d.lib</span><br><span class="line">opencv_legacy2411d.lib</span><br><span class="line">opencv_ml2411d.lib</span><br><span class="line">opencv_nonfree2411d.lib</span><br><span class="line">opencv_objdetect2411d.lib</span><br><span class="line">opencv_ocl2411d.lib</span><br><span class="line">opencv_photo2411d.lib</span><br><span class="line">opencv_stitching2411d.lib</span><br><span class="line">opencv_superres2411d.lib</span><br><span class="line">opencv_ts2411d.lib</span><br><span class="line">opencv_video2411d.lib</span><br><span class="line">opencv_videostab2411d.lib</span><br></pre></td></tr></table></figure>
+<p>注意：对于不同的版本，要将后面的2411改为相应的版本号；对于Debug版本，后面有个字母d,而对于Release版本，则没有d，应根据实际情况添加。</p>
+</li>
+<li>添加好之后，点击属性页面板右下角的应用，确定。</li>
+<li>在<code>Debug|win32</code>文件夹上右击，选择保存，该属性表就保存好了。</li>
+<li>在该项目目录下面找到这个属性表，保存到一个安全的地方，下次在要用OpenCV的工程里，找出属性管理器，右键，选择添加现有属性表即可。<br>我将四种情况所需的属性表和添加的附加依赖库的列表都放到了github上，或许能帮到你（注意只适用于VS2012）。</li>
+</ol>
+<p>整个配置过程就是这样了，配置好之后就可以安心的使用OpenCV 了！</p>
+<p>最后，测试一下，做个图像处理的“Hello World”:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#include &lt;iostream&gt;</span></span><br><span class="line"><span class="comment">#include &lt;string&gt;</span></span><br><span class="line"><span class="comment">#include &lt;opencv2\opencv.hpp&gt;</span></span><br><span class="line"></span><br><span class="line">using namespace std;</span><br><span class="line">using namespace cv;</span><br><span class="line"></span><br><span class="line">int <span class="function"><span class="title">main</span></span>()</span><br><span class="line">&#123;</span><br><span class="line">	Mat img = imread(<span class="string">"lena.jpg"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (img.empty())</span><br><span class="line">	&#123;</span><br><span class="line">		cout &lt;&lt; <span class="string">"error"</span>;</span><br><span class="line">		<span class="built_in">return</span> -<span class="number">1</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	imshow(<span class="string">"lena"</span>, img);</span><br><span class="line">	<span class="built_in">wait</span>Key();</span><br><span class="line"></span><br><span class="line">	<span class="built_in">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>出来的图像：</p>
+<p><img src="https://vra.blog.ustc.edu.cn/wp-content/uploads/2015/04/lena.png" alt=""></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/学习总结/">学习总结</a>►<a class="article-category-link" href="/categories/学习总结/计算机视觉/">计算机视觉</a>►<a class="article-category-link" href="/categories/学习总结/计算机视觉/OpenCV/">OpenCV</a>
+</div>
+
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://vra.github.io/2015/04/22/opencv-vs-config/" data-title="OpenCV配置——在Visual Studio中使用OpenCV | Yunfeng&#39;s Hexo Blog" data-tsina="5582731363" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/25/opencv-linux-install/" title="OpenCV配置——在Linux中使用OpenCV">
+  <strong>上一篇：</strong><br/>
+  <span>
+  OpenCV配置——在Linux中使用OpenCV</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/03/31/cpp-type-cast/"  title="C++学习总结4——类型转换">
+ <strong>下一篇：</strong><br/> 
+ <span>C++学习总结4——类型转换
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2015/04/22/opencv-vs-config/" data-title="OpenCV配置——在Visual Studio中使用OpenCV" data-url="http://vra.github.io/2015/04/22/opencv-vs-config/"></div>
+</section>
+
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#下载OpenCV包"><span class="toc-number">1.</span> <span class="toc-text">下载OpenCV包</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#添加环境变量"><span class="toc-number">2.</span> <span class="toc-text">添加环境变量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#生成独立的OpenCV配置属性表"><span class="toc-number">3.</span> <span class="toc-text">生成独立的OpenCV配置属性表</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/学习总结/C/" title="C++">C++<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/OpenCV/" title="OpenCV">OpenCV<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Sublime-Text/" title="Sublime Text">Sublime Text<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/四季风物/" title="四季风物">四季风物<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/" title="学习总结">学习总结<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/我们的记录/" title="我们的记录">我们的记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/朝花夕拾/" title="朝花夕拾">朝花夕拾<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/未分类/" title="未分类">未分类<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/速记/" title="速记">速记<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Linux/" title="Linux">Linux<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C++">C++<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/学习总结/" title="学习总结">学习总结<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/并行计算/" title="并行计算">并行计算<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python/" title="Python">Python<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Caffe/" title="Caffe">Caffe<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Sublime-Text/" title="Sublime Text">Sublime Text<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/GPU/" title="GPU">GPU<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/总结/" title="总结">总结<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web编程/" title="Web编程">Web编程<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CUDA/" title="CUDA">CUDA<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Nvidia/" title="Nvidia">Nvidia<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Shell/" title="Shell">Shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/博客备忘/" title="博客备忘">博客备忘<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/matlab/" title="matlab">matlab<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/asciinema/" title="asciinema">asciinema<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Make/" title="Make">Make<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/机器学习-总结/" title="机器学习 总结">机器学习 总结<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/Apache/" style="font-size: 10px;">Apache</a> <a href="/tags/C/" style="font-size: 20px;">C++</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CUDA/" style="font-size: 12px;">CUDA</a> <a href="/tags/Caffe/" style="font-size: 14px;">Caffe</a> <a href="/tags/Deep-Learning/" style="font-size: 10px;">Deep Learning</a> <a href="/tags/DeepLearning/" style="font-size: 10px;">DeepLearning</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/GPU/" style="font-size: 14px;">GPU</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Make/" style="font-size: 10px;">Make</a> <a href="/tags/Nvidia/" style="font-size: 10px;">Nvidia</a> <a href="/tags/OpenMP/" style="font-size: 10px;">OpenMP</a> <a href="/tags/PIL/" style="font-size: 10px;">PIL</a> <a href="/tags/Python/" style="font-size: 14px;">Python</a> <a href="/tags/Shell/" style="font-size: 10px;">Shell</a> <a href="/tags/Siamese-Network/" style="font-size: 10px;">Siamese Network</a> <a href="/tags/Spark/" style="font-size: 10px;">Spark</a> <a href="/tags/Sublime-Text/" style="font-size: 14px;">Sublime Text</a> <a href="/tags/Web编程/" style="font-size: 12px;">Web编程</a> <a href="/tags/Wordpress/" style="font-size: 10px;">Wordpress</a> <a href="/tags/asciinema/" style="font-size: 10px;">asciinema</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/matlab/" style="font-size: 10px;">matlab</a> <a href="/tags/博客备忘/" style="font-size: 10px;">博客备忘</a> <a href="/tags/图像处理/" style="font-size: 10px;">图像处理</a> <a href="/tags/学习总结/" style="font-size: 18px;">学习总结</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/并行计算/" style="font-size: 16px;">并行计算</a> <a href="/tags/总结/" style="font-size: 12px;">总结</a> <a href="/tags/机器学习-总结/" style="font-size: 10px;">机器学习 总结</a> <a href="/tags/深度学习/" style="font-size: 10px;">深度学习</a> <a href="/tags/计算机视觉/" style="font-size: 12px;">计算机视觉</a> <a href="/tags/速记/" style="font-size: 10px;">速记</a>
+    </div>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://cra.blog.ustc.edu.cn" target="_blank" title="他年得傍蟾宫客">他年得傍蟾宫客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=5582731363&verifier=db8de729&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Yunfeng Wang in USTC <br/>
+			This is my blog, keep thinking, keep working</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/5582731363" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/vra" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		<a href="http://stackoverflow.com/users/2932001" target="_blank" class="icon-stack-overflow" title="stackoverflow"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Yunfeng Wang">Yunfeng Wang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"vra"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'yunfengshexoblog';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255298630'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255298630' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  <!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</body>
+</html>

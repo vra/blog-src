@@ -1,0 +1,718 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Linux下通过修改fstab来自动挂载Windows 分区 | Yunfeng&#39;s Hexo Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Yunfeng Wang">
+    
+
+    
+    <meta name="description" content="我电脑装的是Windows和Linux双系统,以前在Linux下,要打开Windows系统的C盘或D盘,总是要输入密码,很麻烦,而且麻烦了很长时间.
+后来有一天浩哥看到了,说可以在Linux开机时自动挂载Windows分区,修改/etc/fstab这个文件,可以采用每个分区的UUID.后来校长也看到了我每次麻烦的操作,说是确实可以搞,而且他已经搞定了.我想我也得搞搞了.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux下通过修改fstab来自动挂载Windows 分区">
+<meta property="og:url" content="http://vra.github.io/2014/12/14/fstab-automount-windows-partitions/index.html">
+<meta property="og:site_name" content="Yunfeng's Hexo Blog">
+<meta property="og:description" content="我电脑装的是Windows和Linux双系统,以前在Linux下,要打开Windows系统的C盘或D盘,总是要输入密码,很麻烦,而且麻烦了很长时间.
+后来有一天浩哥看到了,说可以在Linux开机时自动挂载Windows分区,修改/etc/fstab这个文件,可以采用每个分区的UUID.后来校长也看到了我每次麻烦的操作,说是确实可以搞,而且他已经搞定了.我想我也得搞搞了.">
+<meta property="og:updated_time" content="2017-01-08T09:23:44.734Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux下通过修改fstab来自动挂载Windows 分区">
+<meta name="twitter:description" content="我电脑装的是Windows和Linux双系统,以前在Linux下,要打开Windows系统的C盘或D盘,总是要输入密码,很麻烦,而且麻烦了很长时间.
+后来有一天浩哥看到了,说可以在Linux开机时自动挂载Windows分区,修改/etc/fstab这个文件,可以采用每个分区的UUID.后来校长也看到了我每次麻烦的操作,说是确实可以搞,而且他已经搞定了.我想我也得搞搞了.">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Yunfeng&#39;s Hexo Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/author.jpg">
+    
+    
+    <link rel="apple-touch-icon" href="/img/logo.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Yunfeng&#39;s Hexo Blog" title="Yunfeng&#39;s Hexo Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Yunfeng&#39;s Hexo Blog">Yunfeng&#39;s Hexo Blog</a></h1>
+				<h2 class="blog-motto">Life is the process of learning</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					<li>
+						<a href="/atom.xml">RSS</a>
+					</li>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/12/14/fstab-automount-windows-partitions/" title="Linux下通过修改fstab来自动挂载Windows 分区" itemprop="url">Linux下通过修改fstab来自动挂载Windows 分区</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Yunfeng Wang" target="_blank" itemprop="author">Yunfeng Wang</a>
+		
+  <p class="article-time">
+    <time datetime="2014-12-14T13:14:47.000Z" itemprop="datePublished"> 发表于 2014-12-14</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-file_system:"><span class="toc-number">1.</span> <span class="toc-text">1.file system:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-mount_point:"><span class="toc-number">2.</span> <span class="toc-text">2.mount point:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-type"><span class="toc-number">3.</span> <span class="toc-text">3.type</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-option:"><span class="toc-number">4.</span> <span class="toc-text">4.option:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-dump"><span class="toc-number">5.</span> <span class="toc-text">5.dump</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-pass:"><span class="toc-number">6.</span> <span class="toc-text">6.pass:</span></a></li></ol>
+		
+		</div>
+		
+		<p>我电脑装的是Windows和Linux双系统,以前在Linux下,要打开Windows系统的C盘或D盘,总是要输入密码,很麻烦,而且麻烦了很长时间.</p>
+<p>后来有一天浩哥看到了,说可以在Linux开机时自动挂载Windows分区,修改<code>/etc/fstab</code>这个文件,可以采用每个分区的UUID.后来校长也看到了我每次麻烦的操作,说是确实可以搞,而且他已经搞定了.我想我也得搞搞了.<br><a id="more"></a></p>
+<p>fstab文件位于<code>/etc</code>目录下，是一个多文件系统的信息描述文件,应用程序不能修改它,而它的维护和修改任务则需要系统管理员来完成.每个分区在fstab中表示为一行,一行有6个域(field),每个域用空格或tab键隔开.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ cat /etc/fstab</span><br><span class="line"></span><br><span class="line"><span class="comment"># /etc/fstab: static file system information.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Use `blkid` to print the universally unique identifier for a</span></span><br><span class="line"><span class="comment"># device; this may be used with UUID= as a more robust way to name devices</span></span><br><span class="line"><span class="comment"># that works even if disks are added and removed. See fstab(5).</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># file    mount    type    options    dump    pass             </span></span><br><span class="line"><span class="comment"># / was on /dev/sda6 during installation</span></span><br><span class="line">UUID=<span class="number">22</span>b1037f-<span class="number">6</span>c5e-<span class="number">46</span>d0-b965-<span class="number">44</span>cc42313795 /             ext4       errors=remount-ro  <span class="number">0</span> <span class="number">1</span></span><br><span class="line"><span class="comment"># /home was on /dev/sda5 during installation</span></span><br><span class="line">UUID=<span class="number">7</span>c4b5af9-<span class="number">599</span>b-<span class="number">4052</span>-aeb1-<span class="number">5</span>dbd78f4d8e8 /home         ext4        defaults          <span class="number">0</span> <span class="number">2</span></span><br><span class="line">/dev/sr0                                  /media/cdrom0 udf,iso9660 user,noauto       <span class="number">0</span> <span class="number">0</span></span><br><span class="line">devpts                                    /dev/pts      devpts      defaults          <span class="number">0</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>可以看到,6个域名称分别是</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">file    mount    <span class="built_in">type</span>    options    dump    pass</span><br></pre></td></tr></table></figure>
+<p>而且Linux系统分区已经挂载好了,所以我们接下来只要添加Windows分区就可以了。<br>6个域详细介绍如下:</p>
+<h3 id="1-file_system:">1.file system:</h3><p>表示将要挂载的分区的块设备名称.注意这个设备也可以是远程设备,比如说是远程服务器上的某个设备.对于本地设备,该域格式可以是<code>/dev/cdrom</code>,<code>LABEL=&lt;label&gt;</code>,或者<code>UUID=&lt;uuid&gt;</code>三者之一；对于远程文件系统,格式为<host>:<dir>,如 freeshell.ustc.edu.cn:/.远端设备格式好写,对于本地设备,如何获取UUID 号和LABEL呢?我们要挂载的C盘是<code>/dev/sdb1</code>还是<code>/dev/sda5</code>呢?这个可以用<code>blkid</code>命令查看:</dir></host></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sudo blkid</span><br><span class="line">/dev/sda1: LABEL=<span class="string">"M-gM-3M-;M-gM-;M-^_M-dM-?M-^]M-gM-^UM-^Y"</span> UUID=<span class="string">"9ED61632D6160B63"</span> TYPE=<span class="string">"ntfs"</span> PARTUUID=<span class="string">"5be4a3f9-01"</span> </span><br><span class="line">/dev/sda2: UUID=<span class="string">"908265F98265E466"</span> TYPE=<span class="string">"ntfs"</span> PARTUUID=<span class="string">"5be4a3f9-02"</span> </span><br><span class="line">/dev/sda3: UUID=<span class="string">"98B6FE61B6FE3EF6"</span> TYPE=<span class="string">"ntfs"</span> PARTUUID=<span class="string">"5be4a3f9-03"</span> </span><br><span class="line">/dev/sda5: UUID=<span class="string">"7c4b5af9-599b-4052-aeb1-5dbd78f4d8e8"</span> TYPE=<span class="string">"ext4"</span> PARTUUID=<span class="string">"5be4a3f9-05"</span> </span><br><span class="line">/dev/sda6: UUID=<span class="string">"22b1037f-6c5e-46d0-b965-44cc42313795"</span> TYPE=<span class="string">"ext4"</span> PARTUUID=<span class="string">"5be4a3f9-06"</span></span><br></pre></td></tr></table></figure>
+<p>我们知道,Windows的文件系统格式是ntfs(new technology file system),从上面的输出中我们可以知道,要挂载的Windows分区是<code>/dev/sda2</code>和<code>/dev/sda3</code>.因为这两个分区没有LABEL,所有就没法采用<code>LABEL=&lt;label&gt;</code>的方式来表示第一个域了.所以我们要挂载的两块Windows分区的第一个域可以这样写:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#C盘</span></span><br><span class="line">/dev/sda2</span><br><span class="line"><span class="comment">#D盘</span></span><br><span class="line">/dev/sda3</span><br></pre></td></tr></table></figure>
+<p>或者:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#C盘 </span></span><br><span class="line">UUID=<span class="number">908265</span>F98265E466 </span><br><span class="line"><span class="comment">#D盘 </span></span><br><span class="line">UUID=<span class="number">98</span>B6FE61B6FE3EF6</span><br></pre></td></tr></table></figure>
+<h3 id="2-mount_point:">2.mount point:</h3><p>即挂载点,使用过mount命令的同学应该明白这个域是干什么的,简单来说就是将物理的存储盘在Linux系统中找一个点放置下来,相当于在Linux文件树上找一个点,将物理存储对应到这个点上.挂载在这个点后,所有对该点的操作都会写入到对应的物理存储中.在最顶上的挂载例子中,我们看到UUID=22b1037f-6c5e-46d0-b965-44cc42313795(从<code>blkid</code>命令结果可以看出,该分区是<code>/dev/sda6</code>)的物理存储挂载到了/目录(Linux系统根目录),也就是说/目录下面的所有东西都写入到该分区中(/home目录除外),同理,所有/home目录下的内容都写入到UUID=7c4b5af9-599b-4052-aeb1-5dbd78f4d8e8(从<code>blkid</code>命令结果可以看出,该分区是<code>/dev/sda5</code>)的分区中  </p>
+<p>那么,我们要把C盘和D盘挂载到哪里呢?我是这样做的: a.先查看没有自动挂载Windows分区之前,手动挂载时,系统会把C盘和D盘挂载到哪,结果如下:<code>/media/wang</code>(wang是我的用户名),C盘被命名为908265F98265E466,D盘被命名为98B6FE61B6FE3EF6,即其相应的UUID. b.所以我想,可能是挂载到<code>/media</code>目录下的任意一个子目录下吧, 所以我将该域分别设置为<code>/media/c</code>和<code>/media/d</code>,综合前两个域,应该写成:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#C盘</span></span><br><span class="line">/dev/sda2 /media/c</span><br><span class="line"><span class="comment">#D盘</span></span><br><span class="line">/dev/sda3 /media/d</span><br></pre></td></tr></table></figure>
+<p>或者:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#C盘 </span></span><br><span class="line">UUID=<span class="number">908265</span>F98265E466 /media/c</span><br><span class="line"><span class="comment">#D盘 </span></span><br><span class="line">UUID=<span class="number">98</span>B6FE61B6FE3EF6 /media/d</span><br></pre></td></tr></table></figure>
+<h3 id="3-type">3.type</h3><p>即文件系统的格式,像Linux下常用的 ext,ext1,ext2,ext3,Windows下常用的fat16,fat32,ntfs等.可以根据blkid命令的结果来写该域.根据<code>blkid</code>的结果, 我们要挂载的C盘和D盘的文件系统格式为ntfs,所以前三个域都确定了,有如下写法:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#C盘</span></span><br><span class="line">/dev/sda2 /media/c ntfs</span><br><span class="line"><span class="comment">#D盘</span></span><br><span class="line">/dev/sda3 /media/d ntfs</span><br></pre></td></tr></table></figure>
+<p>或者:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#C盘 </span></span><br><span class="line">UUID=<span class="number">908265</span>F98265E466 /media/c ntfs</span><br><span class="line"><span class="comment">#D盘 </span></span><br><span class="line">UUID=<span class="number">98</span>B6FE61B6FE3EF6 /media/d ntfs</span><br></pre></td></tr></table></figure>
+<h3 id="4-option:">4.option:</h3><p>选项,该域表示挂载的时候的一些选项,主要有6个选项,每个选项用逗号隔开,下面详细说明每个选项的含义:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">default:使用默认选项</span><br><span class="line">noauto:当执行mount <span class="operator">-a</span>(即挂载全部文件系统,开机时会执行此命令)时忽略此条记录,也就是跟没写进fstab一样</span><br><span class="line">user:允许特定的用户来挂载,如user=bob,则只能允许bob这个用户来挂载</span><br><span class="line">owner:允许物理设备的拥有者来挂载</span><br><span class="line">comment:为fstab维护程序提供一些说明</span><br><span class="line">nofail:在挂载失败后,忽略此错误,继续往下执行</span><br></pre></td></tr></table></figure></p>
+<p>因为我们没有特殊要求,所以就选default.所以前四个域可以写成这样子:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#C盘</span></span><br><span class="line">/dev/sda2 /media/c ntfs default</span><br><span class="line"><span class="comment">#D盘</span></span><br><span class="line">/dev/sda3 /media/d ntfs default</span><br></pre></td></tr></table></figure>
+<p>或者:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#C盘 </span></span><br><span class="line">UUID=<span class="number">908265</span>F98265E466 /media/c ntfs default</span><br><span class="line"><span class="comment">#D盘 </span></span><br><span class="line">UUID=<span class="number">98</span>B6FE61B6FE3EF6 /media/d ntfs default</span><br></pre></td></tr></table></figure>
+<h3 id="5-dump">5.dump</h3><p>dump这个命令执行备份操作,该域为0,表示执行dump操作时忽略该分区,如果为1,则表示执行dump时也会备份该分区.因为我们没有备份的需求,所以该域设置为0,所以前五个域为:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#C盘</span></span><br><span class="line">/dev/sda2 /media/c ntfs default <span class="number">0</span></span><br><span class="line"><span class="comment">#D盘</span></span><br><span class="line">/dev/sda3 /media/d ntfs default <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>或者:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#C盘 </span></span><br><span class="line">UUID=<span class="number">908265</span>F98265E466 /media/c ntfs default <span class="number">0</span></span><br><span class="line"><span class="comment">#D盘 </span></span><br><span class="line">UUID=<span class="number">98</span>B6FE61B6FE3EF6 /media/d ntfs default <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<h3 id="6-pass:">6.pass:</h3><p>不是passwd的pass,而是系统重启时检查分区正常与否时,该分区的检查顺序.根目录所在分区passno是1,其他分区为2.如果设置为0,则表示不检查.我们的C盘和D盘不想让Linux检查,所以设置为0.所以综合以上步骤,我们可以写出下面的完整的两条记录:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#C盘</span></span><br><span class="line">/dev/sda2 /media/c ntfs default <span class="number">0</span> <span class="number">0</span></span><br><span class="line"><span class="comment">#D盘</span></span><br><span class="line">/dev/sda3 /media/d ntfs default <span class="number">0</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>或者:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#C盘 </span></span><br><span class="line">UUID=<span class="number">908265</span>F98265E466 /media/c ntfs default <span class="number">0</span> <span class="number">0</span></span><br><span class="line"><span class="comment">#D盘 </span></span><br><span class="line">UUID=<span class="number">98</span>B6FE61B6FE3EF6 /media/d ntfs default <span class="number">0</span> <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>按理来说这两种形式都可以的,将任一种形式的两条记录添加到fstab文件中,重新启动系统,下次打开Windows系统的分区时,应该就不需要输入密码了. 但正如前面提到的,使用UUID的方式更健壮些,比如有的移动硬盘或U盘,拔下来再次插入的时候<code>/dev/sda</code>的编号可能会变,但其对应的UUID不会变,所以使用UUID会省下许多麻烦,推荐使用UUID形式.</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/学习总结/">学习总结</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Linux/">Linux</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://vra.github.io/2014/12/14/fstab-automount-windows-partitions/" data-title="Linux下通过修改fstab来自动挂载Windows 分区 | Yunfeng&#39;s Hexo Blog" data-tsina="5582731363" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/12/15/devices-partition-filesystem/" title="设备文件,分区和文件系统辨析">
+  <strong>上一篇：</strong><br/>
+  <span>
+  设备文件,分区和文件系统辨析</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/12/14/debian-discuz/"  title="Debian 下搭建Discuz!论坛">
+ <strong>下一篇：</strong><br/> 
+ <span>Debian 下搭建Discuz!论坛
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2014/12/14/fstab-automount-windows-partitions/" data-title="Linux下通过修改fstab来自动挂载Windows 分区" data-url="http://vra.github.io/2014/12/14/fstab-automount-windows-partitions/"></div>
+</section>
+
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-file_system:"><span class="toc-number">1.</span> <span class="toc-text">1.file system:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-mount_point:"><span class="toc-number">2.</span> <span class="toc-text">2.mount point:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-type"><span class="toc-number">3.</span> <span class="toc-text">3.type</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-option:"><span class="toc-number">4.</span> <span class="toc-text">4.option:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-dump"><span class="toc-number">5.</span> <span class="toc-text">5.dump</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-pass:"><span class="toc-number">6.</span> <span class="toc-text">6.pass:</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/学习总结/C/" title="C++">C++<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/OpenCV/" title="OpenCV">OpenCV<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Sublime-Text/" title="Sublime Text">Sublime Text<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/四季风物/" title="四季风物">四季风物<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/" title="学习总结">学习总结<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/我们的记录/" title="我们的记录">我们的记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/朝花夕拾/" title="朝花夕拾">朝花夕拾<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/未分类/" title="未分类">未分类<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/速记/" title="速记">速记<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Linux/" title="Linux">Linux<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C++">C++<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/学习总结/" title="学习总结">学习总结<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/并行计算/" title="并行计算">并行计算<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python/" title="Python">Python<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Caffe/" title="Caffe">Caffe<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Sublime-Text/" title="Sublime Text">Sublime Text<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/GPU/" title="GPU">GPU<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/总结/" title="总结">总结<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web编程/" title="Web编程">Web编程<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CUDA/" title="CUDA">CUDA<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Nvidia/" title="Nvidia">Nvidia<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Shell/" title="Shell">Shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/博客备忘/" title="博客备忘">博客备忘<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/matlab/" title="matlab">matlab<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/asciinema/" title="asciinema">asciinema<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Make/" title="Make">Make<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/机器学习-总结/" title="机器学习 总结">机器学习 总结<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/Apache/" style="font-size: 10px;">Apache</a> <a href="/tags/C/" style="font-size: 20px;">C++</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CUDA/" style="font-size: 12px;">CUDA</a> <a href="/tags/Caffe/" style="font-size: 14px;">Caffe</a> <a href="/tags/Deep-Learning/" style="font-size: 10px;">Deep Learning</a> <a href="/tags/DeepLearning/" style="font-size: 10px;">DeepLearning</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/GPU/" style="font-size: 14px;">GPU</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Make/" style="font-size: 10px;">Make</a> <a href="/tags/Nvidia/" style="font-size: 10px;">Nvidia</a> <a href="/tags/OpenMP/" style="font-size: 10px;">OpenMP</a> <a href="/tags/PIL/" style="font-size: 10px;">PIL</a> <a href="/tags/Python/" style="font-size: 14px;">Python</a> <a href="/tags/Shell/" style="font-size: 10px;">Shell</a> <a href="/tags/Siamese-Network/" style="font-size: 10px;">Siamese Network</a> <a href="/tags/Spark/" style="font-size: 10px;">Spark</a> <a href="/tags/Sublime-Text/" style="font-size: 14px;">Sublime Text</a> <a href="/tags/Web编程/" style="font-size: 12px;">Web编程</a> <a href="/tags/Wordpress/" style="font-size: 10px;">Wordpress</a> <a href="/tags/asciinema/" style="font-size: 10px;">asciinema</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/matlab/" style="font-size: 10px;">matlab</a> <a href="/tags/博客备忘/" style="font-size: 10px;">博客备忘</a> <a href="/tags/图像处理/" style="font-size: 10px;">图像处理</a> <a href="/tags/学习总结/" style="font-size: 18px;">学习总结</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/并行计算/" style="font-size: 16px;">并行计算</a> <a href="/tags/总结/" style="font-size: 12px;">总结</a> <a href="/tags/机器学习-总结/" style="font-size: 10px;">机器学习 总结</a> <a href="/tags/深度学习/" style="font-size: 10px;">深度学习</a> <a href="/tags/计算机视觉/" style="font-size: 12px;">计算机视觉</a> <a href="/tags/速记/" style="font-size: 10px;">速记</a>
+    </div>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://cra.blog.ustc.edu.cn" target="_blank" title="他年得傍蟾宫客">他年得傍蟾宫客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=5582731363&verifier=db8de729&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Yunfeng Wang in USTC <br/>
+			This is my blog, keep thinking, keep working</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/5582731363" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/vra" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		<a href="http://stackoverflow.com/users/2932001" target="_blank" class="icon-stack-overflow" title="stackoverflow"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Yunfeng Wang">Yunfeng Wang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"vra"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'yunfengshexoblog';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255298630'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255298630' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  <!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</body>
+</html>

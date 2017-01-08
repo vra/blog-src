@@ -1,0 +1,713 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>C++学习总结1——几个基本概念 | Yunfeng&#39;s Hexo Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Yunfeng Wang">
+    
+
+    
+    <meta name="description" content="最近我在做毕设。写程序的时候，总是被C++里面的指针搞得头昏脑胀。刚开始的时候还有些浮躁，不想静下心来仔细看看指针使用的细节。过了几天发现只在Visual Studio里面调试怎么也搞不定，只好硬着头皮，重新学习指针的用法。在看书和看别人写的博客后，感觉学到了许多新的东西，不光是关于指针，还有其他一些以前我不太清楚的内容。这些知识如果不常用或不记录下来的话，肯定会忘掉的，所以我就把它们都写下来，避">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++学习总结1——几个基本概念">
+<meta property="og:url" content="http://vra.github.io/2015/01/24/cpp-concepts/index.html">
+<meta property="og:site_name" content="Yunfeng's Hexo Blog">
+<meta property="og:description" content="最近我在做毕设。写程序的时候，总是被C++里面的指针搞得头昏脑胀。刚开始的时候还有些浮躁，不想静下心来仔细看看指针使用的细节。过了几天发现只在Visual Studio里面调试怎么也搞不定，只好硬着头皮，重新学习指针的用法。在看书和看别人写的博客后，感觉学到了许多新的东西，不光是关于指针，还有其他一些以前我不太清楚的内容。这些知识如果不常用或不记录下来的话，肯定会忘掉的，所以我就把它们都写下来，避">
+<meta property="og:image" content="https://vra.blog.ustc.edu.cn/wp-content/uploads/2015/01/error_pointer_no_initation.png">
+<meta property="og:updated_time" content="2017-01-08T09:23:44.734Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C++学习总结1——几个基本概念">
+<meta name="twitter:description" content="最近我在做毕设。写程序的时候，总是被C++里面的指针搞得头昏脑胀。刚开始的时候还有些浮躁，不想静下心来仔细看看指针使用的细节。过了几天发现只在Visual Studio里面调试怎么也搞不定，只好硬着头皮，重新学习指针的用法。在看书和看别人写的博客后，感觉学到了许多新的东西，不光是关于指针，还有其他一些以前我不太清楚的内容。这些知识如果不常用或不记录下来的话，肯定会忘掉的，所以我就把它们都写下来，避">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Yunfeng&#39;s Hexo Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/author.jpg">
+    
+    
+    <link rel="apple-touch-icon" href="/img/logo.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Yunfeng&#39;s Hexo Blog" title="Yunfeng&#39;s Hexo Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Yunfeng&#39;s Hexo Blog">Yunfeng&#39;s Hexo Blog</a></h1>
+				<h2 class="blog-motto">Life is the process of learning</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					<li>
+						<a href="/atom.xml">RSS</a>
+					</li>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/24/cpp-concepts/" title="C++学习总结1——几个基本概念" itemprop="url">C++学习总结1——几个基本概念</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Yunfeng Wang" target="_blank" itemprop="author">Yunfeng Wang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-01-24T09:15:14.000Z" itemprop="datePublished"> 发表于 2015-01-24</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#声明和定义"><span class="toc-number">1.</span> <span class="toc-text">声明和定义</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#声明(declaration)"><span class="toc-number">1.1.</span> <span class="toc-text">声明(declaration)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#定义(definition)"><span class="toc-number">1.2.</span> <span class="toc-text">定义(definition)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#初始化和赋值"><span class="toc-number">2.</span> <span class="toc-text">初始化和赋值</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#初始化"><span class="toc-number">2.1.</span> <span class="toc-text">初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#赋值"><span class="toc-number">2.2.</span> <span class="toc-text">赋值</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#系统默认初始化规则"><span class="toc-number">3.</span> <span class="toc-text">系统默认初始化规则</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#内置类型变量"><span class="toc-number">3.1.</span> <span class="toc-text">内置类型变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#类类型变量"><span class="toc-number">3.2.</span> <span class="toc-text">类类型变量</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考内容"><span class="toc-number">4.</span> <span class="toc-text">参考内容</span></a></li></ol>
+		
+		</div>
+		
+		<p>最近我在做毕设。写程序的时候，总是被C++里面的指针搞得头昏脑胀。刚开始的时候还有些浮躁，不想静下心来仔细看看指针使用的细节。过了几天发现只在Visual Studio里面调试怎么也搞不定，只好硬着头皮，重新学习指针的用法。在看书和看别人写的博客后，感觉学到了许多新的东西，不光是关于指针，还有其他一些以前我不太清楚的内容。这些知识如果不常用或不记录下来的话，肯定会忘掉的，所以我就把它们都写下来，避免以后犯同样的错误。</p>
+<a id="more"></a>
+<h2 id="声明和定义">声明和定义</h2><h3 id="声明(declaration)">声明(declaration)</h3><p>声明用于向编译器表明变量，函数或类的类型和名字，并不会为其申请存储空间，只是向程序表明了这个对象的存在。变量声明格式如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">int</span> i;    <span class="comment">//变量声明</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> a,<span class="keyword">int</span> b)</span></span>;      <span class="comment">//函数声明</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> MyClass;   <span class="comment">//类的声明</span></span><br></pre></td></tr></table></figure>
+<p>注意：语句<code>int i;</code>是定义，在前面加了“extern”关键字后才是声明。</p>
+<p>声明不会分配存储空间，所以同一个对象可以声明多次。</p>
+<h3 id="定义(definition)">定义(definition)</h3><p>变量定义会为其分配存储空间，函数定义则必须给出函数实现的细节，类的定义需要指定类的成员，类函数的实现等等。定义也是一种声明（平时我们说的“声明”，特指那些不是定义的声明）。定义格式如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> i;    <span class="comment">//变量定义</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fun1</span><span class="params">(<span class="keyword">int</span> a,<span class="keyword">int</span> b)</span>    <span class="comment">//函数定义</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a+b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> MyClass            <span class="comment">//类的定义</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">set_a</span><span class="params">(<span class="keyword">int</span> a)</span></span>&#123;m_a=a;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">int</span> <span class="title">get_a</span><span class="params">()</span></span>&#123;<span class="keyword">return</span> m_a;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> m_a;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>在一个程序中，每个对象只能定义一次。如果多次定义，会出现<strong>重复定义（redefinition）</strong>的错误。</p>
+<p>如果声明时有初始化式，则该声明也是定义。根据“定义只能由一次，声明可以有多次”的规则，有如下例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="keyword">double</span> pi=<span class="number">3.14159</span>;    <span class="comment">//ok:definition</span></span><br><span class="line"></span><br><span class="line">doulbe pi;                   <span class="comment">//error: redefinition of pi</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">double</span> pi;            <span class="comment">//ok:declaration of pi;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">double</span> pi=<span class="number">3.14</span>;       <span class="comment">//error: redefinition of pi</span></span><br></pre></td></tr></table></figure>
+<p>仔细理解上述4个语句，应该就会对声明和定义有个比较清楚的概念。</p>
+<h2 id="初始化和赋值">初始化和赋值</h2><h3 id="初始化">初始化</h3><p>初始化指<strong>创建对象的时候</strong>给它赋初始值。如</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> age=<span class="number">22</span>;      </span><br><span class="line"></span><br><span class="line"><span class="keyword">float</span> height;</span><br></pre></td></tr></table></figure>
+<p>则age为经过初始化的变量，height为未初始化的变量。指针类型变量的初始化过程如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> age = <span class="number">22</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span>* p_age = &amp;age;    <span class="comment">//initation of p_age</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span>** pp_age = &amp;p_age; <span class="comment">//initation of pp_age</span></span><br></pre></td></tr></table></figure>
+<p>指针的初始化很容易犯错，像下面的错误我就犯过很多次：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span>* pi;</span><br><span class="line"></span><br><span class="line">    *pi=<span class="number">23</span>;           <span class="comment">//错误：pi未初始化</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">float</span>* pf=<span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    pf=<span class="number">3.4</span>;          <span class="comment">//错误：pf指向不合法内存</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* pc=<span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span> c=<span class="string">'a'</span>;</span><br><span class="line"></span><br><span class="line">    pc= &amp;c;            <span class="comment">//正确</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面例子中，pi未进行初始化，所以pi指向的是未知的内存区域，在编译会出错。像pi这样，指向内存区域不确定或无意义的指针称为“野指针”。</p>
+<p>pf虽然经过了初始化，但指向的是内存空间的0位置，而不是指向一个float型变量的内存区域，所以运行时会出错，如下所示：</p>
+<p><img src="https://vra.blog.ustc.edu.cn/wp-content/uploads/2015/01/error_pointer_no_initation.png" alt=""></p>
+<p>pc的使用方式则是合法的。</p>
+<p>指针还可以用于new和delete语句，后面会进行描述。</p>
+<h3 id="赋值">赋值</h3><p>赋值指擦除对象的当前值并用新值来代替。可以认为，初始化就是给变量第一次赋值的过程。<strong>对于未初始化的变量，除了用作赋值操作的左操作数，用于其他用途都是没有意义的。</strong></p>
+<h2 id="系统默认初始化规则">系统默认初始化规则</h2><p>所谓系统默认初始化规则，就是在声明变量时未对其进行初始化的情况下，编译器对其赋值的一套规则。对于内置类型和类类型，规则不同；对于函数内变量和函数外变量，定义规则也不同。</p>
+<h3 id="内置类型变量">内置类型变量</h3><p>内置类型指int，float，char和void等基本类型（在C++中，string不是内置类型）。对于内置类型，如果在函数中定义，则系统不对其进行自动赋值；如果在函数外定义（即全局变量），则将其初始化为0（这里的“0”对不同的类型有不同的意义：对int变量，为整数0，对char变量，为‘’）。建议对每个内置类型的变量都显式地初始化。</p>
+<p>对全局变量和局部变量的默认初始化规则不同，归根结底是因为它们保存的位置不同。全局变量保存在全局数据区，该区域的变量在编译时会自动初始化；对于局部变量，系统启动时不会为其开辟内存空间，只有当它所在的函数被调用时，才在栈中建立函数数据空间。变量如果没有显式初始化，则其值为随机值。很重要的一点是：永远不要依赖随机值。</p>
+<h3 id="类类型变量">类类型变量</h3><p>对于类类型变量，不论其是在函数内还是函数外定义，只要有默认构造函数，则系统就会自动调用其默认构造函数，如</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">string</span> out;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="built_in">string</span> in;    </span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因为string类有默认构造函数，所以out和in都被自动初始化为””。</p>
+<p>如果没有默认构造函数，则定义时必须提供显式的初始化式。因为C++中类会自动地增加一个默认构造函数，所以这种情况比较少见。</p>
+<h2 id="参考内容">参考内容</h2><p>1.《C++ Primer第4版》</p>
+<p>2.<a href="http://www.cprogramming.com/declare_vs_define.html" target="_blank" rel="external">Declare vs Define in C and C++</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/学习总结/">学习总结</a>►<a class="article-category-link" href="/categories/学习总结/C/">C++</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/C/">C++</a><a href="/tags/学习总结/">学习总结</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://vra.github.io/2015/01/24/cpp-concepts/" data-title="C++学习总结1——几个基本概念 | Yunfeng&#39;s Hexo Blog" data-tsina="5582731363" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/25/cpp-memory-mode/" title="C++学习总结2——C++内存模型">
+  <strong>上一篇：</strong><br/>
+  <span>
+  C++学习总结2——C++内存模型</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/12/31/some-new-poems/"  title="一些新看到的诗词">
+ <strong>下一篇：</strong><br/> 
+ <span>一些新看到的诗词
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2015/01/24/cpp-concepts/" data-title="C++学习总结1——几个基本概念" data-url="http://vra.github.io/2015/01/24/cpp-concepts/"></div>
+</section>
+
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#声明和定义"><span class="toc-number">1.</span> <span class="toc-text">声明和定义</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#声明(declaration)"><span class="toc-number">1.1.</span> <span class="toc-text">声明(declaration)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#定义(definition)"><span class="toc-number">1.2.</span> <span class="toc-text">定义(definition)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#初始化和赋值"><span class="toc-number">2.</span> <span class="toc-text">初始化和赋值</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#初始化"><span class="toc-number">2.1.</span> <span class="toc-text">初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#赋值"><span class="toc-number">2.2.</span> <span class="toc-text">赋值</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#系统默认初始化规则"><span class="toc-number">3.</span> <span class="toc-text">系统默认初始化规则</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#内置类型变量"><span class="toc-number">3.1.</span> <span class="toc-text">内置类型变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#类类型变量"><span class="toc-number">3.2.</span> <span class="toc-text">类类型变量</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考内容"><span class="toc-number">4.</span> <span class="toc-text">参考内容</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/学习总结/C/" title="C++">C++<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/OpenCV/" title="OpenCV">OpenCV<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Sublime-Text/" title="Sublime Text">Sublime Text<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/四季风物/" title="四季风物">四季风物<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/" title="学习总结">学习总结<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/我们的记录/" title="我们的记录">我们的记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/朝花夕拾/" title="朝花夕拾">朝花夕拾<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/未分类/" title="未分类">未分类<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/速记/" title="速记">速记<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Linux/" title="Linux">Linux<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C++">C++<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/学习总结/" title="学习总结">学习总结<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/并行计算/" title="并行计算">并行计算<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python/" title="Python">Python<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Caffe/" title="Caffe">Caffe<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Sublime-Text/" title="Sublime Text">Sublime Text<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/GPU/" title="GPU">GPU<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/总结/" title="总结">总结<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web编程/" title="Web编程">Web编程<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CUDA/" title="CUDA">CUDA<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Nvidia/" title="Nvidia">Nvidia<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Shell/" title="Shell">Shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/博客备忘/" title="博客备忘">博客备忘<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/matlab/" title="matlab">matlab<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/asciinema/" title="asciinema">asciinema<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Make/" title="Make">Make<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/机器学习-总结/" title="机器学习 总结">机器学习 总结<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/Apache/" style="font-size: 10px;">Apache</a> <a href="/tags/C/" style="font-size: 20px;">C++</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CUDA/" style="font-size: 12px;">CUDA</a> <a href="/tags/Caffe/" style="font-size: 14px;">Caffe</a> <a href="/tags/Deep-Learning/" style="font-size: 10px;">Deep Learning</a> <a href="/tags/DeepLearning/" style="font-size: 10px;">DeepLearning</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/GPU/" style="font-size: 14px;">GPU</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Make/" style="font-size: 10px;">Make</a> <a href="/tags/Nvidia/" style="font-size: 10px;">Nvidia</a> <a href="/tags/OpenMP/" style="font-size: 10px;">OpenMP</a> <a href="/tags/PIL/" style="font-size: 10px;">PIL</a> <a href="/tags/Python/" style="font-size: 14px;">Python</a> <a href="/tags/Shell/" style="font-size: 10px;">Shell</a> <a href="/tags/Siamese-Network/" style="font-size: 10px;">Siamese Network</a> <a href="/tags/Spark/" style="font-size: 10px;">Spark</a> <a href="/tags/Sublime-Text/" style="font-size: 14px;">Sublime Text</a> <a href="/tags/Web编程/" style="font-size: 12px;">Web编程</a> <a href="/tags/Wordpress/" style="font-size: 10px;">Wordpress</a> <a href="/tags/asciinema/" style="font-size: 10px;">asciinema</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/matlab/" style="font-size: 10px;">matlab</a> <a href="/tags/博客备忘/" style="font-size: 10px;">博客备忘</a> <a href="/tags/图像处理/" style="font-size: 10px;">图像处理</a> <a href="/tags/学习总结/" style="font-size: 18px;">学习总结</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/并行计算/" style="font-size: 16px;">并行计算</a> <a href="/tags/总结/" style="font-size: 12px;">总结</a> <a href="/tags/机器学习-总结/" style="font-size: 10px;">机器学习 总结</a> <a href="/tags/深度学习/" style="font-size: 10px;">深度学习</a> <a href="/tags/计算机视觉/" style="font-size: 12px;">计算机视觉</a> <a href="/tags/速记/" style="font-size: 10px;">速记</a>
+    </div>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://cra.blog.ustc.edu.cn" target="_blank" title="他年得傍蟾宫客">他年得傍蟾宫客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=5582731363&verifier=db8de729&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Yunfeng Wang in USTC <br/>
+			This is my blog, keep thinking, keep working</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/5582731363" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/vra" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		<a href="http://stackoverflow.com/users/2932001" target="_blank" class="icon-stack-overflow" title="stackoverflow"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Yunfeng Wang">Yunfeng Wang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"vra"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'yunfengshexoblog';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255298630'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255298630' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  <!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</body>
+</html>

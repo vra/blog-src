@@ -1,0 +1,747 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>机器学习笔记-总结 | Yunfeng&#39;s Hexo Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Yunfeng Wang">
+    
+
+    
+    <meta name="description" content="机器学习笔记是我这学期在上”统计学习”这门课时学习到的内容的一个总结.因为过往很多学过的知识,现在大多都已经忘掉了,而统计机器学习的内容则很重要,我可不能再上过就忘掉,所以在复习的时候把这些内容都记录下来,以便以后查阅.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习笔记-总结">
+<meta property="og:url" content="http://vra.github.io/2015/12/12/machine-learning-summary/index.html">
+<meta property="og:site_name" content="Yunfeng's Hexo Blog">
+<meta property="og:description" content="机器学习笔记是我这学期在上”统计学习”这门课时学习到的内容的一个总结.因为过往很多学过的知识,现在大多都已经忘掉了,而统计机器学习的内容则很重要,我可不能再上过就忘掉,所以在复习的时候把这些内容都记录下来,以便以后查阅.">
+<meta property="og:image" content="http://7xlt5t.com1.z0.glb.clouddn.com/01loss.png">
+<meta property="og:image" content="http://7xlt5t.com1.z0.glb.clouddn.com/pingfang.png">
+<meta property="og:image" content="http://7xlt5t.com1.z0.glb.clouddn.com/jueduizhi.png">
+<meta property="og:image" content="http://7xlt5t.com1.z0.glb.clouddn.com/duishu.png">
+<meta property="og:image" content="http://7xlt5t.com1.z0.glb.clouddn.com/overfitting.gif">
+<meta property="og:updated_time" content="2017-01-08T09:23:44.790Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="机器学习笔记-总结">
+<meta name="twitter:description" content="机器学习笔记是我这学期在上”统计学习”这门课时学习到的内容的一个总结.因为过往很多学过的知识,现在大多都已经忘掉了,而统计机器学习的内容则很重要,我可不能再上过就忘掉,所以在复习的时候把这些内容都记录下来,以便以后查阅.">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Yunfeng&#39;s Hexo Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/author.jpg">
+    
+    
+    <link rel="apple-touch-icon" href="/img/logo.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Yunfeng&#39;s Hexo Blog" title="Yunfeng&#39;s Hexo Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Yunfeng&#39;s Hexo Blog">Yunfeng&#39;s Hexo Blog</a></h1>
+				<h2 class="blog-motto">Life is the process of learning</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					<li>
+						<a href="/atom.xml">RSS</a>
+					</li>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/12/12/machine-learning-summary/" title="机器学习笔记-总结" itemprop="url">机器学习笔记-总结</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Yunfeng Wang" target="_blank" itemprop="author">Yunfeng Wang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-12-12T05:43:42.000Z" itemprop="datePublished"> 发表于 2015-12-12</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#基本概念"><span class="toc-number">1.</span> <span class="toc-text">基本概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#模型的种类"><span class="toc-number">2.</span> <span class="toc-text">模型的种类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#学习的策略"><span class="toc-number">3.</span> <span class="toc-text">学习的策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#经典机器学习算法"><span class="toc-number">4.</span> <span class="toc-text">经典机器学习算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#欠拟合(under-fitting)和过拟合(over-ftting)"><span class="toc-number">5.</span> <span class="toc-text">欠拟合(under-fitting)和过拟合(over-ftting)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#交叉验证(Cross_Validation)"><span class="toc-number">6.</span> <span class="toc-text">交叉验证(Cross Validation)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#判别模型(Discriminative_model)和生成模型(generative_model)"><span class="toc-number">7.</span> <span class="toc-text">判别模型(Discriminative model)和生成模型(generative model)</span></a></li></ol>
+		
+		</div>
+		
+		<p>机器学习笔记是我这学期在上”统计学习”这门课时学习到的内容的一个总结.因为过往很多学过的知识,现在大多都已经忘掉了,而统计机器学习的内容则很重要,我可不能再上过就忘掉,所以在复习的时候把这些内容都记录下来,以便以后查阅.<br><a id="more"></a></p>
+<h2 id="基本概念">基本概念</h2><ol>
+<li>学习：一个系统在完成一项任务T的时候,使用了数据E,使得在评判标准P下,性能获得了提升,这就是学习  </li>
+<li>统计学习的对象是数据,关于统计学习的基本假设是：同类数据服从一定的统计规律性,即数据都是独立同分布的  </li>
+<li>统计学习中的问题可以分为4大类,分别是 <ul>
+<li>监督学习：解决<strong>预测</strong>问题, 根据预测变量是否连续,分为回归问题和分类问题</li>
+<li>非监督学习：解决<strong>分析</strong>型问题, 分为聚类(.如图像分割).,密度估计和关联分析三类</li>
+<li>半监督学习：问题中既有分析的部分,又有预测的部分,主要有主动学习(.先分析,出现问题时向人要数据(.如分类label).).</li>
+<li>增强学习：在合适过程中,根据反馈做新的判断,主动增强自身的学习,典型应用：机器人足球</li>
+</ul>
+</li>
+<li>统计学习的基本步骤<ol>
+<li>获取数据(.即E).</li>
+<li>确定用什么样的数学模型,所有模型构成假设空间</li>
+<li>有了一组模型后,确定策略,即如何来找到最优的模型</li>
+<li>写出模型选择策略的算法</li>
+<li>通过学习得到最优模型</li>
+<li>用学习到的模型来在新的数据上进行分析和预测</li>
+</ol>
+</li>
+<li>学习的三大要素：模型,策略,算法.模型是知识的集合,策略是模型选择的准则,算法就是学习的具体方法</li>
+</ol>
+<h2 id="模型的种类">模型的种类</h2><ol>
+<li>线性模型(Linear model)：y=ax+b,算法实例：线性回归(Linear regression)</li>
+<li>对数线性(Log-linear model)：算法实例：逻辑斯蒂回归(Logistic regression)</li>
+<li>稀疏模型(Sparse model)：形式也是y=ax+b,但a很稀疏,算法实例：稀疏分解(Sparese decomposition)</li>
+<li>非线性核方法(Non-linear by kernel),利用核技巧将非线性问题转化为线性问题,实例：支持向量机(SVM, support vector machine)</li>
+<li>层级非线性(Layered nonlinear)：实例：神经网络(Neural Network)</li>
+<li>图模型(Graphic model)：将数据看作随机变量的话,它们之间的依赖关系可用图来表示,实例：贝叶斯网络(Bayes network)</li>
+<li>树模型(Tree model)：对输入变量进行分块处理,每个子块有可以使用别的机器学习算法,实例：决策树(Decision tree),提升数(Boosting tree)</li>
+<li>混合模型(Mixture model)：实例：聚类(Clustering)<br>上述模型中,1-5为非概率模型,6,8为概率模型,7为混合类型,概率模型和非概率模型可能都有.</li>
+</ol>
+<h2 id="学习的策略">学习的策略</h2><p>策略是模型选择的准则,为了量化模型的好坏,我们定义了损失函数和风险函数<br>损失函数(Loss function)：也叫代价函数(Cost function),用来度量模型对于<strong>一个</strong>输入<code>X</code>产生的预测值<code>f(x)</code>与真实值<code>Y</code>之间的差异的大小.常见的损失函数有:</p>
+<ol>
+<li>0-1 损失函数(0-1 loss function)<br><img src="http://7xlt5t.com1.z0.glb.clouddn.com/01loss.png" alt=""></li>
+<li>平方损失函数(Square loss function)<br><img src="http://7xlt5t.com1.z0.glb.clouddn.com/pingfang.png" alt=""></li>
+<li>绝对值损失函数(Absolute loss function)<br><img src="http://7xlt5t.com1.z0.glb.clouddn.com/jueduizhi.png" alt=""></li>
+<li>对数损失函数(Log loss function)<br><img src="http://7xlt5t.com1.z0.glb.clouddn.com/duishu.png" alt=""><br>风险函数是损失函数的期望,即将模型的输入输出<code>XY</code>作为随机变量,风险函数就是模型<code>f(X)</code>关于联合分布<code>P(X,Y)</code>的平均意义下的损失.风险函数的值越小,表示模型预测结果越准确,这种模型就越好,所以机器学习的目的就是最小化风险函数(Rish miniization).需要注意的是：<code>P(X,Y)</code>是未知的<br>如果给定数据集,我们可以计算在该数据集上的平均损失,这个损失定义为经验风险.经验风险在数据量足够大的时候,能很好的近似期望风险,但在数据量较少的时候误差会比较大.<br>在经验风险的基础上,加上表示模型复杂度的正则化项,则构成结构风险.结构风险能有效的防止过拟合,因为结构风险要求经验风险和模型复杂度同时都小.  </li>
+</ol>
+<h2 id="经典机器学习算法">经典机器学习算法</h2><p>分类算法：</p>
+<ol>
+<li>K近邻(KNN, K Nearest Neighbor)</li>
+<li>朴素贝叶斯(Naive Bayes)</li>
+<li>支持向量机(SVM, Support Vector Machine)</li>
+<li>AdaBoost </li>
+</ol>
+<p>聚类算法：</p>
+<ol>
+<li>K-Means </li>
+<li>期望最大化(EM, Expectation Maximization)</li>
+</ol>
+<p>回归算法：</p>
+<ol>
+<li>脊回归(Ridge regression)</li>
+<li>Lasso回归(The Least Absolute Shrinkage and Selectionator Operator)</li>
+</ol>
+<p>关联分析算法：</p>
+<ol>
+<li>先验算法(Aprior)</li>
+</ol>
+<p>降维算法：</p>
+<ol>
+<li>主成份分析法(PCA, Principal Component Analysis)</li>
+<li>局部线性嵌入(Locally linear embedding)</li>
+</ol>
+<h2 id="欠拟合(under-fitting)和过拟合(over-ftting)">欠拟合(under-fitting)和过拟合(over-ftting)</h2><p>在训练模型的时候,有的时候需要选择不同的复杂度(.如不同参数的个数).来训练,不同的复杂度体现了模型对训练数据的拟合程度.<br>如果参数过少,模型过于简单,则模型不能很好的拟合训练数据,这种情况称为欠拟合,很显然,欠拟合因为连训练数据的规律都没有学习到,所以对于预测,性能肯定不会太好.<br>另一方面,如果参数太多,模型过于复杂,则对训练数据可以做到特别好的拟合,但由于训练数据是有噪声和误差的,这种情况会将训练数据的噪声和误差都考虑进来,在测试集上性能反而会下降.下面是训练误差和测试误差与模型复杂度的关系<br><img src="http://7xlt5t.com1.z0.glb.clouddn.com/overfitting.gif" alt=""></p>
+<h2 id="交叉验证(Cross_Validation)">交叉验证(Cross Validation)</h2><p>学习的最终目的是预测,即学习一个模型,使得对未知数据能很好地预测.在实际操作中,一般将数据集分为3部分：训练集,验证集和测试集.为了验证在训练集上学习到的模型好坏,需要现在验证集上进行验证.实际中数据总是不充足的,所以需要重复使用数据,采用交叉验证的方法.最常用的交叉验证方法是S折交叉验证方法.<br>S折交叉验证方法(S-fold cross validation)：随机地将数据切分为S个互不相交的子集,然后利用S-1个子集的数据训练模型,利用余下的1个子集作为测试集.测试集的选择有S中情况,所以这种验证可以进行S次.对每个模型,都进行S次训练和验证,然后求出平均测试误差,将平均测试误差最小的模型作为最优模型.<br>当数据量特别少的时候,我们将每个数据分为一个子集,即如果有N个数据,则S=N,这种方法称为留一交叉验证(Leave-one-out cross validation).</p>
+<h2 id="判别模型(Discriminative_model)和生成模型(generative_model)">判别模型(Discriminative model)和生成模型(generative model)</h2><p>生成式方法：对于某个给定的输入<code>X</code>,先学习得到联合分布<code>P(X,Y)</code>,再计算<code>P(Y|X)</code>,也即该方法考虑给定输入<code>X</code>,输出<code>Y</code>是怎么生成的,要求得到一个关于整体的信息,即对<code>P(X,Y)</code>进行建模.<br>生成式方法应用更广,适用于各种机器学习问题,而且收敛速度快,而且对于有隐变量的情况,也适用.但由于需要建模<code>XY</code>的联合分布,所以不能进行降维处理.<br>常见的生成式模型有朴素贝叶斯法和隐马尔科夫模型.<br>判别式方法：对于某个给定的输入<code>X</code>,直接给出预测值<code>f(X)</code>或<code>P(Y|X)</code>.该方法关注的是对于给定的输入<code>X</code>,应该预测什么样的输出<code>Y</code>,而不用去考虑数据整体的分布这些信息,即对<code>P(Y|X)</code>建模.<br>常见的判别模型有KNN,感知机,决策树,逻辑斯蒂回归,最大熵模型,SVM,AdaBoost,条件随机场等.<br>判别式方法只能用于分类和回归问题,可以对<code>X</code>进行降维处理.  </p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/机器学习-总结/">机器学习 总结</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://vra.github.io/2015/12/12/machine-learning-summary/" data-title="机器学习笔记-总结 | Yunfeng&#39;s Hexo Blog" data-tsina="5582731363" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/01/17/default-deleted/" title="c++11新特性：default和delete">
+  <strong>上一篇：</strong><br/>
+  <span>
+  c++11新特性：default和delete</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/09/12/gpu-programming-2/"  title="GPU并行计算和CUDA编程(2)-GPU体系架构概述">
+ <strong>下一篇：</strong><br/> 
+ <span>GPU并行计算和CUDA编程(2)-GPU体系架构概述
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2015/12/12/machine-learning-summary/" data-title="机器学习笔记-总结" data-url="http://vra.github.io/2015/12/12/machine-learning-summary/"></div>
+</section>
+
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#基本概念"><span class="toc-number">1.</span> <span class="toc-text">基本概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#模型的种类"><span class="toc-number">2.</span> <span class="toc-text">模型的种类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#学习的策略"><span class="toc-number">3.</span> <span class="toc-text">学习的策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#经典机器学习算法"><span class="toc-number">4.</span> <span class="toc-text">经典机器学习算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#欠拟合(under-fitting)和过拟合(over-ftting)"><span class="toc-number">5.</span> <span class="toc-text">欠拟合(under-fitting)和过拟合(over-ftting)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#交叉验证(Cross_Validation)"><span class="toc-number">6.</span> <span class="toc-text">交叉验证(Cross Validation)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#判别模型(Discriminative_model)和生成模型(generative_model)"><span class="toc-number">7.</span> <span class="toc-text">判别模型(Discriminative model)和生成模型(generative model)</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/学习总结/C/" title="C++">C++<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/OpenCV/" title="OpenCV">OpenCV<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Sublime-Text/" title="Sublime Text">Sublime Text<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/四季风物/" title="四季风物">四季风物<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/" title="学习总结">学习总结<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/我们的记录/" title="我们的记录">我们的记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/朝花夕拾/" title="朝花夕拾">朝花夕拾<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/未分类/" title="未分类">未分类<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/速记/" title="速记">速记<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Linux/" title="Linux">Linux<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C++">C++<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/学习总结/" title="学习总结">学习总结<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/并行计算/" title="并行计算">并行计算<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python/" title="Python">Python<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Caffe/" title="Caffe">Caffe<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Sublime-Text/" title="Sublime Text">Sublime Text<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/GPU/" title="GPU">GPU<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/总结/" title="总结">总结<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web编程/" title="Web编程">Web编程<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CUDA/" title="CUDA">CUDA<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Nvidia/" title="Nvidia">Nvidia<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Shell/" title="Shell">Shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/博客备忘/" title="博客备忘">博客备忘<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/matlab/" title="matlab">matlab<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/asciinema/" title="asciinema">asciinema<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Make/" title="Make">Make<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/机器学习-总结/" title="机器学习 总结">机器学习 总结<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/Apache/" style="font-size: 10px;">Apache</a> <a href="/tags/C/" style="font-size: 20px;">C++</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CUDA/" style="font-size: 12px;">CUDA</a> <a href="/tags/Caffe/" style="font-size: 14px;">Caffe</a> <a href="/tags/Deep-Learning/" style="font-size: 10px;">Deep Learning</a> <a href="/tags/DeepLearning/" style="font-size: 10px;">DeepLearning</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/GPU/" style="font-size: 14px;">GPU</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Make/" style="font-size: 10px;">Make</a> <a href="/tags/Nvidia/" style="font-size: 10px;">Nvidia</a> <a href="/tags/OpenMP/" style="font-size: 10px;">OpenMP</a> <a href="/tags/PIL/" style="font-size: 10px;">PIL</a> <a href="/tags/Python/" style="font-size: 14px;">Python</a> <a href="/tags/Shell/" style="font-size: 10px;">Shell</a> <a href="/tags/Siamese-Network/" style="font-size: 10px;">Siamese Network</a> <a href="/tags/Spark/" style="font-size: 10px;">Spark</a> <a href="/tags/Sublime-Text/" style="font-size: 14px;">Sublime Text</a> <a href="/tags/Web编程/" style="font-size: 12px;">Web编程</a> <a href="/tags/Wordpress/" style="font-size: 10px;">Wordpress</a> <a href="/tags/asciinema/" style="font-size: 10px;">asciinema</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/matlab/" style="font-size: 10px;">matlab</a> <a href="/tags/博客备忘/" style="font-size: 10px;">博客备忘</a> <a href="/tags/图像处理/" style="font-size: 10px;">图像处理</a> <a href="/tags/学习总结/" style="font-size: 18px;">学习总结</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/并行计算/" style="font-size: 16px;">并行计算</a> <a href="/tags/总结/" style="font-size: 12px;">总结</a> <a href="/tags/机器学习-总结/" style="font-size: 10px;">机器学习 总结</a> <a href="/tags/深度学习/" style="font-size: 10px;">深度学习</a> <a href="/tags/计算机视觉/" style="font-size: 12px;">计算机视觉</a> <a href="/tags/速记/" style="font-size: 10px;">速记</a>
+    </div>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://cra.blog.ustc.edu.cn" target="_blank" title="他年得傍蟾宫客">他年得傍蟾宫客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=5582731363&verifier=db8de729&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Yunfeng Wang in USTC <br/>
+			This is my blog, keep thinking, keep working</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/5582731363" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/vra" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		<a href="http://stackoverflow.com/users/2932001" target="_blank" class="icon-stack-overflow" title="stackoverflow"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Yunfeng Wang">Yunfeng Wang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"vra"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'yunfengshexoblog';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255298630'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255298630' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  <!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</body>
+</html>

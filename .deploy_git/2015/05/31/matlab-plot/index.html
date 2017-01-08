@@ -1,0 +1,759 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>如何用matlab画稍微美观点的图 | Yunfeng&#39;s Hexo Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Yunfeng Wang">
+    
+
+    
+    <meta name="description" content="本科毕设论文写作过程中，老师指出我用matlab画的图太丑，需要好好改改。于是我这几天参考网上资料，对画图的一些细节进行了设置，得到的图确实比以前好了些。而且我matlab用的不多，很多东西这次用过，下次碰可能要过很长时间，许多之前记得的东西都忘了，所以写下来是很有必要的。另外我现在画的图也只是比之前稍微好点，所以就起了这样一个题目。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何用matlab画稍微美观点的图">
+<meta property="og:url" content="http://vra.github.io/2015/05/31/matlab-plot/index.html">
+<meta property="og:site_name" content="Yunfeng's Hexo Blog">
+<meta property="og:description" content="本科毕设论文写作过程中，老师指出我用matlab画的图太丑，需要好好改改。于是我这几天参考网上资料，对画图的一些细节进行了设置，得到的图确实比以前好了些。而且我matlab用的不多，很多东西这次用过，下次碰可能要过很长时间，许多之前记得的东西都忘了，所以写下来是很有必要的。另外我现在画的图也只是比之前稍微好点，所以就起了这样一个题目。">
+<meta property="og:updated_time" content="2017-01-08T09:23:44.734Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="如何用matlab画稍微美观点的图">
+<meta name="twitter:description" content="本科毕设论文写作过程中，老师指出我用matlab画的图太丑，需要好好改改。于是我这几天参考网上资料，对画图的一些细节进行了设置，得到的图确实比以前好了些。而且我matlab用的不多，很多东西这次用过，下次碰可能要过很长时间，许多之前记得的东西都忘了，所以写下来是很有必要的。另外我现在画的图也只是比之前稍微好点，所以就起了这样一个题目。">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Yunfeng&#39;s Hexo Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/author.jpg">
+    
+    
+    <link rel="apple-touch-icon" href="/img/logo.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Yunfeng&#39;s Hexo Blog" title="Yunfeng&#39;s Hexo Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Yunfeng&#39;s Hexo Blog">Yunfeng&#39;s Hexo Blog</a></h1>
+				<h2 class="blog-motto">Life is the process of learning</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					<li>
+						<a href="/atom.xml">RSS</a>
+					</li>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/05/31/matlab-plot/" title="如何用matlab画稍微美观点的图" itemprop="url">如何用matlab画稍微美观点的图</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Yunfeng Wang" target="_blank" itemprop="author">Yunfeng Wang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-05-31T12:59:42.000Z" itemprop="datePublished"> 发表于 2015-05-31</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-_设置plot"><span class="toc-number">1.</span> <span class="toc-text">1. 设置plot</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#设置曲线形式(LineSpec)"><span class="toc-number">1.1.</span> <span class="toc-text">设置曲线形式(LineSpec)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置曲线宽度:LineWidth"><span class="toc-number">1.2.</span> <span class="toc-text">设置曲线宽度:LineWidth</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置标记大小:MarkerSize"><span class="toc-number">1.3.</span> <span class="toc-text">设置标记大小:MarkerSize</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置标记边缘颜色:MarkerEdgeColor"><span class="toc-number">1.4.</span> <span class="toc-text">设置标记边缘颜色:MarkerEdgeColor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#标记填充颜色:MarkerFaceColor"><span class="toc-number">1.5.</span> <span class="toc-text">标记填充颜色:MarkerFaceColor</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-_设置网格Grid"><span class="toc-number">2.</span> <span class="toc-text">2. 设置网格Grid</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#显示/隐藏网格"><span class="toc-number">2.1.</span> <span class="toc-text">显示/隐藏网格</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#得到当前坐标轴Axis"><span class="toc-number">2.2.</span> <span class="toc-text">得到当前坐标轴Axis</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置网格线类型:GridLineStyle"><span class="toc-number">2.3.</span> <span class="toc-text">设置网格线类型:GridLineStyle</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置网格线透明度：GridAlpha"><span class="toc-number">2.4.</span> <span class="toc-text">设置网格线透明度：GridAlpha</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-_设置坐标轴"><span class="toc-number">3.</span> <span class="toc-text">3. 设置坐标轴</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#设置坐标轴范围"><span class="toc-number">3.1.</span> <span class="toc-text">设置坐标轴范围</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置坐标轴跨度"><span class="toc-number">3.2.</span> <span class="toc-text">设置坐标轴跨度</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-_设置图标题和图中文字"><span class="toc-number">4.</span> <span class="toc-text">4. 设置图标题和图中文字</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#设置图片标题：legend"><span class="toc-number">4.1.</span> <span class="toc-text">设置图片标题：legend</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置x/y轴坐标：x/ylabel"><span class="toc-number">4.2.</span> <span class="toc-text">设置x/y轴坐标：x/ylabel</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置图中文字：text"><span class="toc-number">4.3.</span> <span class="toc-text">设置图中文字：text</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<p>本科毕设论文写作过程中，老师指出我用matlab画的图太丑，需要好好改改。于是我这几天参考网上资料，对画图的一些细节进行了设置，得到的图确实比以前好了些。而且我matlab用的不多，很多东西这次用过，下次碰可能要过很长时间，许多之前记得的东西都忘了，所以写下来是很有必要的。另外我现在画的图也只是比之前稍微好点，所以就起了这样一个题目。</p>
+<a id="more"></a>
+<h2 id="1-_设置plot">1. 设置plot</h2><p>参考内容：<a href="http://www.mathworks.com/help/matlab/ref/plot.html" target="_blank" rel="external">http://www.mathworks.com/help/matlab/ref/plot.html</a></p>
+<h3 id="设置曲线形式(LineSpec)">设置曲线形式(LineSpec)</h3><p>曲线形式包括3个部分，分别是<code>Line Style</code>，<code>marker symbol</code>和<code>color</code>。</p>
+<ol>
+<li><p><code>Line style</code>表示曲线的类别，有4类：</p>
+<ol>
+<li>-：实线(Solid line)，也是默认的格式</li>
+<li>—:虚线(dashed line)，也就是———这种格式</li>
+<li>::点线(dotted line),也就是将引号:横过来的格式</li>
+<li>-.:点虚线(Dash-dot line),就是虚线和点交替出现,-.-.-.-.,不过点是在中间，跟虚线相平的。</li>
+</ol>
+</li>
+<li><p>marker symbol表示数据点的标记形式，有如下几类，直接复制过来了：</p>
+<ol>
+<li>o Circle</li>
+<li><ul>
+<li>Plus sign</li>
+</ul>
+</li>
+<li><ul>
+<li>Asterisk</li>
+</ul>
+</li>
+<li>. Point</li>
+<li>x Cross</li>
+<li>s Square</li>
+<li>d Diamond</li>
+<li>^ Upward-pointing triangle</li>
+<li>v Downward-pointing triangle</li>
+<li><code>&gt;</code> Right-pointing triangle</li>
+<li>&lt; Left-pointing triangle</li>
+<li>p Pentagram</li>
+<li>h Hexagram</li>
+</ol>
+</li>
+<li><p>color表示颜色设置，matlab画图里面所有的颜色都是这几种：</p>
+<ol>
+<li>y yellow</li>
+<li>m magenta,品红</li>
+<li>c cyan,青色</li>
+<li>r red</li>
+<li>g green</li>
+<li>b blue</li>
+<li>w white</li>
+<li>k black</li>
+</ol>
+</li>
+</ol>
+<p>需要主要的有2点：</p>
+<ol>
+<li>这三个选项可以省略任意一个或多个，当省略<code>line style</code>且设定了<code>marker symbol</code>时，这时候得到的只有数据点，没有曲线。</li>
+<li>如果Y值是一个矩阵的时候，如果设定了<code>color</code>选项，怎对所有曲线，颜色都是设定的那种颜色；如果没设定<code>color</code>,则曲线颜色按上面所示颜色顺序依次往下选择。</li>
+</ol>
+<h3 id="设置曲线宽度:LineWidth">设置曲线宽度:LineWidth</h3><p>曲线宽度设置好也是很重要的，默认的曲线太细，不美观，我们可以使用LineWidth来设置，其单位为点的大小,比如</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plot(x,y,<span class="string">'LineWidth'</span>,<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+<p>表示线宽是两倍的点大小。</p>
+<h3 id="设置标记大小:MarkerSize">设置标记大小:MarkerSize</h3><p>标记大小表示前面设定的<code>marker symbol</code>的大小，单位为点的大小。</p>
+<h3 id="设置标记边缘颜色:MarkerEdgeColor">设置标记边缘颜色:MarkerEdgeColor</h3><p>标记边缘颜色就是标记周围一圈的颜色。</p>
+<h3 id="标记填充颜色:MarkerFaceColor">标记填充颜色:MarkerFaceColor</h3><p>标记填充颜色。</p>
+<h2 id="2-_设置网格Grid">2. 设置网格Grid</h2><p>参考内容：</p>
+<ol>
+<li><a href="http://www.mathworks.com/help/matlab/ref/gca.html" target="_blank" rel="external">http://www.mathworks.com/help/matlab/ref/gca.html</a></li>
+<li><a href="http://www.mathworks.com/help/matlab/ref/grid.html" target="_blank" rel="external">http://www.mathworks.com/help/matlab/ref/grid.html</a></li>
+<li><a href="http://www.mathworks.com/help/matlab/ref/axes-properties.html#prop_MinorGridLineStyle" target="_blank" rel="external">http://www.mathworks.com/help/matlab/ref/axes-properties.html#prop_MinorGridLineStyle</a></li>
+<li><a href="http://www.mathworks.com/help/matlab/ref/axes-properties.html#prop_GridAlpha" target="_blank" rel="external">http://www.mathworks.com/help/matlab/ref/axes-properties.html#prop_GridAlpha</a></li>
+</ol>
+<h3 id="显示/隐藏网格">显示/隐藏网格</h3><ol>
+<li>grid on：显示网格</li>
+<li>grid off：隐藏网格</li>
+</ol>
+<h3 id="得到当前坐标轴Axis">得到当前坐标轴Axis</h3><p><code>ax = gca;</code>:得到当前坐标轴，其中<code>gca</code>意为get current axis，实际是一个函数，只不过后面没加括号而已。<br>得到坐标轴后，就可以对图像进行一系列的设置。</p>
+<h3 id="设置网格线类型:GridLineStyle">设置网格线类型:GridLineStyle</h3><figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ax= gca;</span><br><span class="line">ax.GridLineStyle = <span class="string">':'</span>; <span class="comment">%设置网格线为点线</span></span><br></pre></td></tr></table></figure>
+<h3 id="设置网格线透明度：GridAlpha">设置网格线透明度：GridAlpha</h3><p>默认透明度是0.15，可以使用GridAlpha来设置</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ax = gca;</span><br><span class="line">ax.GridAlpha = <span class="number">0.5</span> <span class="comment">%设置透明度为0.5</span></span><br></pre></td></tr></table></figure>
+<h2 id="3-_设置坐标轴">3. 设置坐标轴</h2><h3 id="设置坐标轴范围">设置坐标轴范围</h3><p>可以用<code>axis([xStart xEnd yStart yEnd])</code>这样一条命令来设置坐标轴的范围。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">axis(<span class="matrix">[<span class="number">0.1</span> <span class="number">0.6</span> <span class="number">0.5</span> <span class="number">0.8</span>]</span>);<span class="comment">%x轴从0.1到0.6，y轴从0.5到0.8</span></span><br></pre></td></tr></table></figure>
+<h3 id="设置坐标轴跨度">设置坐标轴跨度</h3><figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">set(gca, <span class="string">'xtick'</span>,<span class="matrix">[xStart:xStep:xEnd]</span>):设置x轴步长，从xStart开始，从xEnd结束，步长是xStep。</span><br><span class="line">set(gca, <span class="string">'ytick'</span>,<span class="matrix">[yStart:yStep:yEnd]</span>):同X轴。</span><br></pre></td></tr></table></figure>
+<h2 id="4-_设置图标题和图中文字">4. 设置图标题和图中文字</h2><p>参考内容：</p>
+<p><a href="http://www.mathworks.com/help/matlab/ref/legend.html" target="_blank" rel="external">http://www.mathworks.com/help/matlab/ref/legend.html</a></p>
+<h3 id="设置图片标题：legend">设置图片标题：legend</h3><figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">legend(<span class="string">'figure1'</span>);</span><br></pre></td></tr></table></figure>
+<h3 id="设置x/y轴坐标：x/ylabel">设置x/y轴坐标：x/ylabel</h3><figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">xlabel(<span class="string">'\alpha'</span>);</span><br><span class="line">ylabel(<span class="string">'soccer'</span>);</span><br></pre></td></tr></table></figure>
+<h3 id="设置图中文字：text">设置图中文字：text</h3><p>使用方法：text(xPos, yPos,’str’)</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span> : <span class="number">10</span></span><br><span class="line">	text(x(<span class="built_in">i</span>)+<span class="number">0.1</span>, y(<span class="built_in">i</span>)+<span class="number">0.3</span>, num2str(y(<span class="built_in">i</span>))); <span class="comment">%num2str：将数字转换为字符</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>上面代码表示在(x+0.1, y+0.3)处显示y的值</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/matlab/">matlab</a><a href="/tags/学习总结/">学习总结</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://vra.github.io/2015/05/31/matlab-plot/" data-title="如何用matlab画稍微美观点的图 | Yunfeng&#39;s Hexo Blog" data-tsina="5582731363" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/06/02/blog-transfer-record/" title="博客迁移记录">
+  <strong>上一篇：</strong><br/>
+  <span>
+  博客迁移记录</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/05/29/sublime-text-summary-2/"  title="Sublime Text 使用技巧2">
+ <strong>下一篇：</strong><br/> 
+ <span>Sublime Text 使用技巧2
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2015/05/31/matlab-plot/" data-title="如何用matlab画稍微美观点的图" data-url="http://vra.github.io/2015/05/31/matlab-plot/"></div>
+</section>
+
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-_设置plot"><span class="toc-number">1.</span> <span class="toc-text">1. 设置plot</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#设置曲线形式(LineSpec)"><span class="toc-number">1.1.</span> <span class="toc-text">设置曲线形式(LineSpec)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置曲线宽度:LineWidth"><span class="toc-number">1.2.</span> <span class="toc-text">设置曲线宽度:LineWidth</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置标记大小:MarkerSize"><span class="toc-number">1.3.</span> <span class="toc-text">设置标记大小:MarkerSize</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置标记边缘颜色:MarkerEdgeColor"><span class="toc-number">1.4.</span> <span class="toc-text">设置标记边缘颜色:MarkerEdgeColor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#标记填充颜色:MarkerFaceColor"><span class="toc-number">1.5.</span> <span class="toc-text">标记填充颜色:MarkerFaceColor</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-_设置网格Grid"><span class="toc-number">2.</span> <span class="toc-text">2. 设置网格Grid</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#显示/隐藏网格"><span class="toc-number">2.1.</span> <span class="toc-text">显示/隐藏网格</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#得到当前坐标轴Axis"><span class="toc-number">2.2.</span> <span class="toc-text">得到当前坐标轴Axis</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置网格线类型:GridLineStyle"><span class="toc-number">2.3.</span> <span class="toc-text">设置网格线类型:GridLineStyle</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置网格线透明度：GridAlpha"><span class="toc-number">2.4.</span> <span class="toc-text">设置网格线透明度：GridAlpha</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-_设置坐标轴"><span class="toc-number">3.</span> <span class="toc-text">3. 设置坐标轴</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#设置坐标轴范围"><span class="toc-number">3.1.</span> <span class="toc-text">设置坐标轴范围</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置坐标轴跨度"><span class="toc-number">3.2.</span> <span class="toc-text">设置坐标轴跨度</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-_设置图标题和图中文字"><span class="toc-number">4.</span> <span class="toc-text">4. 设置图标题和图中文字</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#设置图片标题：legend"><span class="toc-number">4.1.</span> <span class="toc-text">设置图片标题：legend</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置x/y轴坐标：x/ylabel"><span class="toc-number">4.2.</span> <span class="toc-text">设置x/y轴坐标：x/ylabel</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置图中文字：text"><span class="toc-number">4.3.</span> <span class="toc-text">设置图中文字：text</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/学习总结/C/" title="C++">C++<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/OpenCV/" title="OpenCV">OpenCV<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Sublime-Text/" title="Sublime Text">Sublime Text<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/四季风物/" title="四季风物">四季风物<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/" title="学习总结">学习总结<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/我们的记录/" title="我们的记录">我们的记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/朝花夕拾/" title="朝花夕拾">朝花夕拾<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/未分类/" title="未分类">未分类<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/速记/" title="速记">速记<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Linux/" title="Linux">Linux<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C++">C++<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/学习总结/" title="学习总结">学习总结<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/并行计算/" title="并行计算">并行计算<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python/" title="Python">Python<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Caffe/" title="Caffe">Caffe<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Sublime-Text/" title="Sublime Text">Sublime Text<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/GPU/" title="GPU">GPU<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/总结/" title="总结">总结<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web编程/" title="Web编程">Web编程<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CUDA/" title="CUDA">CUDA<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Nvidia/" title="Nvidia">Nvidia<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Shell/" title="Shell">Shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/博客备忘/" title="博客备忘">博客备忘<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/matlab/" title="matlab">matlab<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/asciinema/" title="asciinema">asciinema<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Make/" title="Make">Make<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/机器学习-总结/" title="机器学习 总结">机器学习 总结<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/Apache/" style="font-size: 10px;">Apache</a> <a href="/tags/C/" style="font-size: 20px;">C++</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CUDA/" style="font-size: 12px;">CUDA</a> <a href="/tags/Caffe/" style="font-size: 14px;">Caffe</a> <a href="/tags/Deep-Learning/" style="font-size: 10px;">Deep Learning</a> <a href="/tags/DeepLearning/" style="font-size: 10px;">DeepLearning</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/GPU/" style="font-size: 14px;">GPU</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Make/" style="font-size: 10px;">Make</a> <a href="/tags/Nvidia/" style="font-size: 10px;">Nvidia</a> <a href="/tags/OpenMP/" style="font-size: 10px;">OpenMP</a> <a href="/tags/PIL/" style="font-size: 10px;">PIL</a> <a href="/tags/Python/" style="font-size: 14px;">Python</a> <a href="/tags/Shell/" style="font-size: 10px;">Shell</a> <a href="/tags/Siamese-Network/" style="font-size: 10px;">Siamese Network</a> <a href="/tags/Spark/" style="font-size: 10px;">Spark</a> <a href="/tags/Sublime-Text/" style="font-size: 14px;">Sublime Text</a> <a href="/tags/Web编程/" style="font-size: 12px;">Web编程</a> <a href="/tags/Wordpress/" style="font-size: 10px;">Wordpress</a> <a href="/tags/asciinema/" style="font-size: 10px;">asciinema</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/matlab/" style="font-size: 10px;">matlab</a> <a href="/tags/博客备忘/" style="font-size: 10px;">博客备忘</a> <a href="/tags/图像处理/" style="font-size: 10px;">图像处理</a> <a href="/tags/学习总结/" style="font-size: 18px;">学习总结</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/并行计算/" style="font-size: 16px;">并行计算</a> <a href="/tags/总结/" style="font-size: 12px;">总结</a> <a href="/tags/机器学习-总结/" style="font-size: 10px;">机器学习 总结</a> <a href="/tags/深度学习/" style="font-size: 10px;">深度学习</a> <a href="/tags/计算机视觉/" style="font-size: 12px;">计算机视觉</a> <a href="/tags/速记/" style="font-size: 10px;">速记</a>
+    </div>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://cra.blog.ustc.edu.cn" target="_blank" title="他年得傍蟾宫客">他年得傍蟾宫客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=5582731363&verifier=db8de729&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Yunfeng Wang in USTC <br/>
+			This is my blog, keep thinking, keep working</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/5582731363" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/vra" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		<a href="http://stackoverflow.com/users/2932001" target="_blank" class="icon-stack-overflow" title="stackoverflow"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Yunfeng Wang">Yunfeng Wang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"vra"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'yunfengshexoblog';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255298630'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255298630' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  <!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</body>
+</html>

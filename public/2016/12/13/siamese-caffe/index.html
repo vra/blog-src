@@ -1,0 +1,691 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Caffe中的Siamese网络 | Yunfeng&#39;s Hexo Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Yunfeng Wang">
+    
+
+    
+    <meta name="description" content="Siamese原意是”泰国的,泰国人”,而与之相关的一个比较常见的词是”Siamese twin”, 意思是是”连体双胞胎”,所以Siamemse Network是从这个意思转变而来,指的是结构非常相似的两路网络,分别训练,但共享各个层的参数,在最后有一个连接的部分.Siamese网络对于相似性比较的场景比较有效.此外Siamese因为共享参数,所以能减少训练过程中的参数个数.这里的slides讲">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Caffe中的Siamese网络">
+<meta property="og:url" content="http://vra.github.io/2016/12/13/siamese-caffe/index.html">
+<meta property="og:site_name" content="Yunfeng's Hexo Blog">
+<meta property="og:description" content="Siamese原意是”泰国的,泰国人”,而与之相关的一个比较常见的词是”Siamese twin”, 意思是是”连体双胞胎”,所以Siamemse Network是从这个意思转变而来,指的是结构非常相似的两路网络,分别训练,但共享各个层的参数,在最后有一个连接的部分.Siamese网络对于相似性比较的场景比较有效.此外Siamese因为共享参数,所以能减少训练过程中的参数个数.这里的slides讲">
+<meta property="og:image" content="http://7xlt5t.com1.z0.glb.clouddn.com/prototxt.jpg">
+<meta property="og:updated_time" content="2017-01-08T09:23:44.618Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Caffe中的Siamese网络">
+<meta name="twitter:description" content="Siamese原意是”泰国的,泰国人”,而与之相关的一个比较常见的词是”Siamese twin”, 意思是是”连体双胞胎”,所以Siamemse Network是从这个意思转变而来,指的是结构非常相似的两路网络,分别训练,但共享各个层的参数,在最后有一个连接的部分.Siamese网络对于相似性比较的场景比较有效.此外Siamese因为共享参数,所以能减少训练过程中的参数个数.这里的slides讲">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Yunfeng&#39;s Hexo Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/author.jpg">
+    
+    
+    <link rel="apple-touch-icon" href="/img/logo.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Yunfeng&#39;s Hexo Blog" title="Yunfeng&#39;s Hexo Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Yunfeng&#39;s Hexo Blog">Yunfeng&#39;s Hexo Blog</a></h1>
+				<h2 class="blog-motto">Life is the process of learning</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					<li>
+						<a href="/atom.xml">RSS</a>
+					</li>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/12/13/siamese-caffe/" title="Caffe中的Siamese网络" itemprop="url">Caffe中的Siamese网络</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Yunfeng Wang" target="_blank" itemprop="author">Yunfeng Wang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-12-13T13:05:01.000Z" itemprop="datePublished"> 发表于 2016-12-13</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Data层"><span class="toc-number">1.</span> <span class="toc-text">1. Data层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Slice层"><span class="toc-number">2.</span> <span class="toc-text">2. Slice层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_共享层"><span class="toc-number">3.</span> <span class="toc-text">3. 共享层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_如何共享参数"><span class="toc-number">4.</span> <span class="toc-text">4. 如何共享参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_feature层"><span class="toc-number">5.</span> <span class="toc-text">5. feature层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-_ContrastiveLoss层"><span class="toc-number">6.</span> <span class="toc-text">6. ContrastiveLoss层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-_网络结构的可视化"><span class="toc-number">7.</span> <span class="toc-text">7. 网络结构的可视化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-_训练过程"><span class="toc-number">8.</span> <span class="toc-text">8. 训练过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-_参考内容"><span class="toc-number">9.</span> <span class="toc-text">9. 参考内容</span></a></li></ol>
+		
+		</div>
+		
+		<p>Siamese原意是”泰国的,泰国人”,而与之相关的一个比较常见的词是”Siamese twin”, 意思是是”连体双胞胎”,所以Siamemse Network是从这个意思转变而来,指的是结构非常相似的两路网络,分别训练,<strong>但共享各个层的参数</strong>,在最后有一个连接的部分.Siamese网络对于相似性比较的场景比较有效.此外Siamese因为共享参数,所以能减少训练过程中的参数个数.<a href="http://vision.ia.ac.cn/zh/senimar/reports/Siamese-Network-Architecture-and-Applications-in-Computer-Vision.pdf" target="_blank" rel="external">这里</a>的slides讲解了Siamese网络在深度学习中的应用.这里我参照Caffe中的<a href="https://github.com/BVLC/caffe/tree/master/examples/siamese" target="_blank" rel="external">Siamese文档</a>, 以LeNet为例,简单地总结下Caffe中Siamese网络的prototxt文件的写法.<br><a id="more"></a></p>
+<h3 id="1-_Data层">1. Data层</h3><p>Data层输入可以是LMDB和LevelDB格式的数据,这种格式的数据可以通过参照<code>$CAFFE_ROOT/examples/siamese/create_mnist_siamese.sh</code>来生成（该脚本是从MNIST原先的格式生成DB文件,如果要从JPEG格式的图片来生成DB文件,需要进行一定的修改）.<br>Data层有2个输出,一个是<code>pair_data</code>,表示配对好的图片对;另一个是<code>sim</code>,表示图片对是否属于同一个label.  </p>
+<h3 id="2-_Slice层">2. Slice层</h3><p>Slice层是Caffe中的一个工具层,功能就是把输入的层(bottom)切分成几个输出层(top).官网给出的如下例子:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"slicer_label"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"Slice"</span></span><br><span class="line">  bottom: <span class="string">"label"</span></span><br><span class="line">  <span class="comment">## Example of label with a shape N x 3 x 1 x 1</span></span><br><span class="line">  top: <span class="string">"label1"</span></span><br><span class="line">  top: <span class="string">"label2"</span></span><br><span class="line">  top: <span class="string">"label3"</span></span><br><span class="line">  slice_param &#123;</span><br><span class="line">    axis: <span class="number">1</span></span><br><span class="line">    slice_point: <span class="number">1</span></span><br><span class="line">    slice_point: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>完成的功能就是把slicer_label划分成3份.<code>axis</code>表示划分的维度,这里1表示在第二个维度上划分;<code>slice_point</code>表示划分的中间的点,分别是<code>1</code>,<code>2</code>表示在1-2层和2-3层之间进行一个划分.<br>在Siamese网络中,为了对数据对进行单独的训练,需要在Data层后面接一个Slice层,将数据均匀地划分为2个部分.  </p>
+<h3 id="3-_共享层">3. 共享层</h3><p>后面的卷积层,Pooling层,Relu层对于两路网络是没有区别的,所以可以直接写好一路后,复制一份在后面作为另一路,不过得将name,bottom和top的名字改成不一样的(示例中第二路的名字都是在第一路对应层的名字后面加了个<code>_p</code>表示pair).  </p>
+<h3 id="4-_如何共享参数">4. 如何共享参数</h3><p>两路网络如何共享参数呢？Caffe里是这样实现的:在每路中对应的层里面都定义一个同名的参数,这样更新参数的时候就可以共享参数了.如下面的例子:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"></span><br><span class="line">layer &#123;                                                                         </span><br><span class="line">  name: <span class="string">"ip2"</span>                                                                   </span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"InnerProduct"</span>                                                          </span><br><span class="line">  bottom: <span class="string">"ip1"</span>                                                                 </span><br><span class="line">  top: <span class="string">"ip2"</span>                                                                    </span><br><span class="line">  param &#123;                                                                       </span><br><span class="line">    name: <span class="string">"ip2_w"</span>                                                               </span><br><span class="line">    lr_mult: <span class="number">1</span>                                                                  </span><br><span class="line">  &#125;                </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">layer &#123;                                                                         </span><br><span class="line">  name: <span class="string">"ip2_p"</span>                                                                 </span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"InnerProduct"</span>                                                          </span><br><span class="line">  bottom: <span class="string">"ip1_p"</span>                                                               </span><br><span class="line">  top: <span class="string">"ip2_p"</span>                                                                  </span><br><span class="line">  param &#123;                                                                       </span><br><span class="line">    name: <span class="string">"ip2_w"</span>                                                               </span><br><span class="line">    lr_mult: <span class="number">1</span>                                                                  </span><br><span class="line">  &#125;              </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>上面例子中,两路网络对应层都定义了<code>ip2_w</code>的参数,这样训练的时候就可以共享这个变量的值了.  </p>
+<h3 id="5-_feature层">5. feature层</h3><p>在2个全连接层后,我们将原来的分类的sofatmax层改为输出一个2维向量的全连接层:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">layer &#123;                                                                         </span><br><span class="line">  name: <span class="string">"feat"</span>                                                                  </span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"InnerProduct"</span>                                                          </span><br><span class="line">  bottom: <span class="string">"ip2"</span>                                                                 </span><br><span class="line">  top: <span class="string">"feat"</span>                                                                   </span><br><span class="line">  param &#123;                                                                       </span><br><span class="line">    name: <span class="string">"feat_w"</span>                                                              </span><br><span class="line">    lr_mult: <span class="number">1</span>                                                                  </span><br><span class="line">  &#125;                                                                             </span><br><span class="line">  param &#123;                                                                       </span><br><span class="line">    name: <span class="string">"feat_b"</span>                                                              </span><br><span class="line">    lr_mult: <span class="number">2</span>                                                                  </span><br><span class="line">  &#125;                                                                             </span><br><span class="line">  inner_product_param &#123;                                                         </span><br><span class="line">    num_output: <span class="number">2</span>                                                               </span><br><span class="line">    weight_filler &#123;                                                             </span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"xavier"</span>                                                            </span><br><span class="line">    &#125;                                                                           </span><br><span class="line">    bias_filler &#123;                                                               </span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"constant"</span>                                                          </span><br><span class="line">    &#125;                                                                           </span><br><span class="line">  &#125;                                                                             </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="6-_ContrastiveLoss层">6. ContrastiveLoss层</h3><p>在两个feature产生后,就可以利用2个feature和前面定义的<code>sim</code>来计算loss了.Siamese网络采用了一个叫做<a href="http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf" target="_blank" rel="external">“ContrastiveLoss”</a>的loss计算方式,如果两个图片越相似,则loss越小;如果越不相似,则loss越大.<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">layer &#123;                                                                         </span><br><span class="line">  name: <span class="string">"loss"</span>                                                                  </span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"ContrastiveLoss"</span>                                                       </span><br><span class="line">  bottom: <span class="string">"feat"</span>                                                                </span><br><span class="line">  bottom: <span class="string">"feat_p"</span>                                                              </span><br><span class="line">  bottom: <span class="string">"sim"</span>                                                                 </span><br><span class="line">  top: <span class="string">"loss"</span>                                                                   </span><br><span class="line">  contrastive_loss_param &#123;                                                      </span><br><span class="line">    margin: <span class="number">1</span>                                                                   </span><br><span class="line">  &#125;                                                                             </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="7-_网络结构的可视化">7. 网络结构的可视化</h3><p>上面就是所有的网络结构,利用<code>$CAFFE_ROOT/python/draw_net.py</code>这个脚本可以画出网络结构,如图所示:<br><img src="http://7xlt5t.com1.z0.glb.clouddn.com/prototxt.jpg" alt="Lenet的Siamese网络结构"></p>
+<p>整个网络的完整内容如下:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br></pre></td><td class="code"><pre><span class="line">name: <span class="string">"mnist_siamese_train_test"</span></span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"pair_data"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"Data"</span></span><br><span class="line">  top: <span class="string">"pair_data"</span></span><br><span class="line">  top: <span class="string">"sim"</span></span><br><span class="line">  include &#123;</span><br><span class="line">    phase: TRAIN</span><br><span class="line">  &#125;</span><br><span class="line">  transform_param &#123;</span><br><span class="line">    scale: <span class="number">0.00390625</span></span><br><span class="line">  &#125;</span><br><span class="line">  data_param &#123;</span><br><span class="line">    <span class="built_in">source</span>: <span class="string">"examples/siamese/mnist_siamese_train_leveldb"</span></span><br><span class="line">    batch_size: <span class="number">64</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"pair_data"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"Data"</span></span><br><span class="line">  top: <span class="string">"pair_data"</span></span><br><span class="line">  top: <span class="string">"sim"</span></span><br><span class="line">  include &#123;</span><br><span class="line">    phase: TEST</span><br><span class="line">  &#125;</span><br><span class="line">  transform_param &#123;</span><br><span class="line">    scale: <span class="number">0.00390625</span></span><br><span class="line">  &#125;</span><br><span class="line">  data_param &#123;</span><br><span class="line">    <span class="built_in">source</span>: <span class="string">"examples/siamese/mnist_siamese_test_leveldb"</span></span><br><span class="line">    batch_size: <span class="number">100</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"slice_pair"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"Slice"</span></span><br><span class="line">  bottom: <span class="string">"pair_data"</span></span><br><span class="line">  top: <span class="string">"data"</span></span><br><span class="line">  top: <span class="string">"data_p"</span></span><br><span class="line">  slice_param &#123;</span><br><span class="line">    slice_dim: <span class="number">1</span></span><br><span class="line">    slice_point: <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"conv1"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"Convolution"</span></span><br><span class="line">  bottom: <span class="string">"data"</span></span><br><span class="line">  top: <span class="string">"conv1"</span></span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"conv1_w"</span></span><br><span class="line">    lr_mult: <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"conv1_b"</span></span><br><span class="line">    lr_mult: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">  convolution_param &#123;</span><br><span class="line">    num_output: <span class="number">20</span></span><br><span class="line">    kernel_size: <span class="number">5</span></span><br><span class="line">    stride: <span class="number">1</span></span><br><span class="line">    weight_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"xavier"</span></span><br><span class="line">    &#125;</span><br><span class="line">    bias_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"constant"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"pool1"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"Pooling"</span></span><br><span class="line">  bottom: <span class="string">"conv1"</span></span><br><span class="line">  top: <span class="string">"pool1"</span></span><br><span class="line">  pooling_param &#123;</span><br><span class="line">    pool: MAX</span><br><span class="line">    kernel_size: <span class="number">2</span></span><br><span class="line">    stride: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"conv2"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"Convolution"</span></span><br><span class="line">  bottom: <span class="string">"pool1"</span></span><br><span class="line">  top: <span class="string">"conv2"</span></span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"conv2_w"</span></span><br><span class="line">    lr_mult: <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"conv2_b"</span></span><br><span class="line">    lr_mult: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">  convolution_param &#123;</span><br><span class="line">    num_output: <span class="number">50</span></span><br><span class="line">    kernel_size: <span class="number">5</span></span><br><span class="line">    stride: <span class="number">1</span></span><br><span class="line">    weight_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"xavier"</span></span><br><span class="line">    &#125;</span><br><span class="line">    bias_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"constant"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"pool2"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"Pooling"</span></span><br><span class="line">  bottom: <span class="string">"conv2"</span></span><br><span class="line">  top: <span class="string">"pool2"</span></span><br><span class="line">  pooling_param &#123;</span><br><span class="line">    pool: MAX</span><br><span class="line">    kernel_size: <span class="number">2</span></span><br><span class="line">    stride: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"ip1"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"InnerProduct"</span></span><br><span class="line">  bottom: <span class="string">"pool2"</span></span><br><span class="line">  top: <span class="string">"ip1"</span></span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"ip1_w"</span></span><br><span class="line">    lr_mult: <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"ip1_b"</span></span><br><span class="line">    lr_mult: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">  inner_product_param &#123;</span><br><span class="line">    num_output: <span class="number">500</span></span><br><span class="line">    weight_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"xavier"</span></span><br><span class="line">    &#125;</span><br><span class="line">    bias_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"constant"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"relu1"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"ReLU"</span></span><br><span class="line">  bottom: <span class="string">"ip1"</span></span><br><span class="line">  top: <span class="string">"ip1"</span></span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"ip2"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"InnerProduct"</span></span><br><span class="line">  bottom: <span class="string">"ip1"</span></span><br><span class="line">  top: <span class="string">"ip2"</span></span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"ip2_w"</span></span><br><span class="line">    lr_mult: <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"ip2_b"</span></span><br><span class="line">    lr_mult: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">  inner_product_param &#123;</span><br><span class="line">    num_output: <span class="number">10</span></span><br><span class="line">    weight_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"xavier"</span></span><br><span class="line">    &#125;</span><br><span class="line">    bias_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"constant"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"feat"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"InnerProduct"</span></span><br><span class="line">  bottom: <span class="string">"ip2"</span></span><br><span class="line">  top: <span class="string">"feat"</span></span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"feat_w"</span></span><br><span class="line">    lr_mult: <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"feat_b"</span></span><br><span class="line">    lr_mult: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">  inner_product_param &#123;</span><br><span class="line">    num_output: <span class="number">2</span></span><br><span class="line">    weight_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"xavier"</span></span><br><span class="line">    &#125;</span><br><span class="line">    bias_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"constant"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"conv1_p"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"Convolution"</span></span><br><span class="line">  bottom: <span class="string">"data_p"</span></span><br><span class="line">  top: <span class="string">"conv1_p"</span></span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"conv1_w"</span></span><br><span class="line">    lr_mult: <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"conv1_b"</span></span><br><span class="line">    lr_mult: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">  convolution_param &#123;</span><br><span class="line">    num_output: <span class="number">20</span></span><br><span class="line">    kernel_size: <span class="number">5</span></span><br><span class="line">    stride: <span class="number">1</span></span><br><span class="line">    weight_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"xavier"</span></span><br><span class="line">    &#125;</span><br><span class="line">    bias_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"constant"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"pool1_p"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"Pooling"</span></span><br><span class="line">  bottom: <span class="string">"conv1_p"</span></span><br><span class="line">  top: <span class="string">"pool1_p"</span></span><br><span class="line">  pooling_param &#123;</span><br><span class="line">    pool: MAX</span><br><span class="line">    kernel_size: <span class="number">2</span></span><br><span class="line">    stride: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"conv2_p"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"Convolution"</span></span><br><span class="line">  bottom: <span class="string">"pool1_p"</span></span><br><span class="line">  top: <span class="string">"conv2_p"</span></span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"conv2_w"</span></span><br><span class="line">    lr_mult: <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"conv2_b"</span></span><br><span class="line">    lr_mult: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">  convolution_param &#123;</span><br><span class="line">    num_output: <span class="number">50</span></span><br><span class="line">    kernel_size: <span class="number">5</span></span><br><span class="line">    stride: <span class="number">1</span></span><br><span class="line">    weight_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"xavier"</span></span><br><span class="line">    &#125;</span><br><span class="line">    bias_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"constant"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"pool2_p"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"Pooling"</span></span><br><span class="line">  bottom: <span class="string">"conv2_p"</span></span><br><span class="line">  top: <span class="string">"pool2_p"</span></span><br><span class="line">  pooling_param &#123;</span><br><span class="line">    pool: MAX</span><br><span class="line">    kernel_size: <span class="number">2</span></span><br><span class="line">    stride: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"ip1_p"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"InnerProduct"</span></span><br><span class="line">  bottom: <span class="string">"pool2_p"</span></span><br><span class="line">  top: <span class="string">"ip1_p"</span></span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"ip1_w"</span></span><br><span class="line">    lr_mult: <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"ip1_b"</span></span><br><span class="line">    lr_mult: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">  inner_product_param &#123;</span><br><span class="line">    num_output: <span class="number">500</span></span><br><span class="line">    weight_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"xavier"</span></span><br><span class="line">    &#125;</span><br><span class="line">    bias_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"constant"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"relu1_p"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"ReLU"</span></span><br><span class="line">  bottom: <span class="string">"ip1_p"</span></span><br><span class="line">  top: <span class="string">"ip1_p"</span></span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"ip2_p"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"InnerProduct"</span></span><br><span class="line">  bottom: <span class="string">"ip1_p"</span></span><br><span class="line">  top: <span class="string">"ip2_p"</span></span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"ip2_w"</span></span><br><span class="line">    lr_mult: <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"ip2_b"</span></span><br><span class="line">    lr_mult: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">  inner_product_param &#123;</span><br><span class="line">    num_output: <span class="number">10</span></span><br><span class="line">    weight_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"xavier"</span></span><br><span class="line">    &#125;</span><br><span class="line">    bias_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"constant"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"feat_p"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"InnerProduct"</span></span><br><span class="line">  bottom: <span class="string">"ip2_p"</span></span><br><span class="line">  top: <span class="string">"feat_p"</span></span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"feat_w"</span></span><br><span class="line">    lr_mult: <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">  param &#123;</span><br><span class="line">    name: <span class="string">"feat_b"</span></span><br><span class="line">    lr_mult: <span class="number">2</span></span><br><span class="line">  &#125;</span><br><span class="line">  inner_product_param &#123;</span><br><span class="line">    num_output: <span class="number">2</span></span><br><span class="line">    weight_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"xavier"</span></span><br><span class="line">    &#125;</span><br><span class="line">    bias_filler &#123;</span><br><span class="line">      <span class="built_in">type</span>: <span class="string">"constant"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">layer &#123;</span><br><span class="line">  name: <span class="string">"loss"</span></span><br><span class="line">  <span class="built_in">type</span>: <span class="string">"ContrastiveLoss"</span></span><br><span class="line">  bottom: <span class="string">"feat"</span></span><br><span class="line">  bottom: <span class="string">"feat_p"</span></span><br><span class="line">  bottom: <span class="string">"sim"</span></span><br><span class="line">  top: <span class="string">"loss"</span></span><br><span class="line">  contrastive_loss_param &#123;</span><br><span class="line">    margin: <span class="number">1</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="8-_训练过程">8. 训练过程</h3><p>训练过程与别的网络是一样的,这里就不具体展开了.</p>
+<h3 id="9-_参考内容">9. 参考内容</h3><ol>
+<li><a href="https://www.quora.com/What-are-Siamese-neural-networks-what-applications-are-they-good-for-and-why" target="_blank" rel="external">https://www.quora.com/What-are-Siamese-neural-networks-what-applications-are-they-good-for-and-why</a></li>
+<li><a href="http://vision.ia.ac.cn/zh/senimar/reports/Siamese-Network-Architecture-and-Applications-in-Computer-Vision.pdf" target="_blank" rel="external">http://vision.ia.ac.cn/zh/senimar/reports/Siamese-Network-Architecture-and-Applications-in-Computer-Vision.pdf</a></li>
+</ol>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Caffe/">Caffe</a><a href="/tags/Siamese-Network/">Siamese Network</a><a href="/tags/深度学习/">深度学习</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://vra.github.io/2016/12/13/siamese-caffe/" data-title="Caffe中的Siamese网络 | Yunfeng&#39;s Hexo Blog" data-tsina="5582731363" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/12/18/nvidia-gpu-names/" title="关于英伟达显卡命名的姿势">
+  <strong>上一篇：</strong><br/>
+  <span>
+  关于英伟达显卡命名的姿势</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2016/11/14/test-asciinema/"  title="在Hexo博客里面插入asciinema终端记录视频">
+ <strong>下一篇：</strong><br/> 
+ <span>在Hexo博客里面插入asciinema终端记录视频
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2016/12/13/siamese-caffe/" data-title="Caffe中的Siamese网络" data-url="http://vra.github.io/2016/12/13/siamese-caffe/"></div>
+</section>
+
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Data层"><span class="toc-number">1.</span> <span class="toc-text">1. Data层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Slice层"><span class="toc-number">2.</span> <span class="toc-text">2. Slice层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_共享层"><span class="toc-number">3.</span> <span class="toc-text">3. 共享层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_如何共享参数"><span class="toc-number">4.</span> <span class="toc-text">4. 如何共享参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_feature层"><span class="toc-number">5.</span> <span class="toc-text">5. feature层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-_ContrastiveLoss层"><span class="toc-number">6.</span> <span class="toc-text">6. ContrastiveLoss层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-_网络结构的可视化"><span class="toc-number">7.</span> <span class="toc-text">7. 网络结构的可视化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-_训练过程"><span class="toc-number">8.</span> <span class="toc-text">8. 训练过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-_参考内容"><span class="toc-number">9.</span> <span class="toc-text">9. 参考内容</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/学习总结/C/" title="C++">C++<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/OpenCV/" title="OpenCV">OpenCV<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Sublime-Text/" title="Sublime Text">Sublime Text<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/四季风物/" title="四季风物">四季风物<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/" title="学习总结">学习总结<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/我们的记录/" title="我们的记录">我们的记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/朝花夕拾/" title="朝花夕拾">朝花夕拾<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/未分类/" title="未分类">未分类<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/速记/" title="速记">速记<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Linux/" title="Linux">Linux<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C++">C++<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/学习总结/" title="学习总结">学习总结<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/并行计算/" title="并行计算">并行计算<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python/" title="Python">Python<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Caffe/" title="Caffe">Caffe<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Sublime-Text/" title="Sublime Text">Sublime Text<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/GPU/" title="GPU">GPU<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/总结/" title="总结">总结<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web编程/" title="Web编程">Web编程<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CUDA/" title="CUDA">CUDA<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Nvidia/" title="Nvidia">Nvidia<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Shell/" title="Shell">Shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/博客备忘/" title="博客备忘">博客备忘<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/matlab/" title="matlab">matlab<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/asciinema/" title="asciinema">asciinema<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Make/" title="Make">Make<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/机器学习-总结/" title="机器学习 总结">机器学习 总结<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/Apache/" style="font-size: 10px;">Apache</a> <a href="/tags/C/" style="font-size: 20px;">C++</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CUDA/" style="font-size: 12px;">CUDA</a> <a href="/tags/Caffe/" style="font-size: 14px;">Caffe</a> <a href="/tags/Deep-Learning/" style="font-size: 10px;">Deep Learning</a> <a href="/tags/DeepLearning/" style="font-size: 10px;">DeepLearning</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/GPU/" style="font-size: 14px;">GPU</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Make/" style="font-size: 10px;">Make</a> <a href="/tags/Nvidia/" style="font-size: 10px;">Nvidia</a> <a href="/tags/OpenMP/" style="font-size: 10px;">OpenMP</a> <a href="/tags/PIL/" style="font-size: 10px;">PIL</a> <a href="/tags/Python/" style="font-size: 14px;">Python</a> <a href="/tags/Shell/" style="font-size: 10px;">Shell</a> <a href="/tags/Siamese-Network/" style="font-size: 10px;">Siamese Network</a> <a href="/tags/Spark/" style="font-size: 10px;">Spark</a> <a href="/tags/Sublime-Text/" style="font-size: 14px;">Sublime Text</a> <a href="/tags/Web编程/" style="font-size: 12px;">Web编程</a> <a href="/tags/Wordpress/" style="font-size: 10px;">Wordpress</a> <a href="/tags/asciinema/" style="font-size: 10px;">asciinema</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/matlab/" style="font-size: 10px;">matlab</a> <a href="/tags/博客备忘/" style="font-size: 10px;">博客备忘</a> <a href="/tags/图像处理/" style="font-size: 10px;">图像处理</a> <a href="/tags/学习总结/" style="font-size: 18px;">学习总结</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/并行计算/" style="font-size: 16px;">并行计算</a> <a href="/tags/总结/" style="font-size: 12px;">总结</a> <a href="/tags/机器学习-总结/" style="font-size: 10px;">机器学习 总结</a> <a href="/tags/深度学习/" style="font-size: 10px;">深度学习</a> <a href="/tags/计算机视觉/" style="font-size: 12px;">计算机视觉</a> <a href="/tags/速记/" style="font-size: 10px;">速记</a>
+    </div>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://cra.blog.ustc.edu.cn" target="_blank" title="他年得傍蟾宫客">他年得傍蟾宫客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=5582731363&verifier=db8de729&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Yunfeng Wang in USTC <br/>
+			This is my blog, keep thinking, keep working</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/5582731363" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/vra" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		<a href="http://stackoverflow.com/users/2932001" target="_blank" class="icon-stack-overflow" title="stackoverflow"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Yunfeng Wang">Yunfeng Wang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"vra"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'yunfengshexoblog';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255298630'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255298630' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  <!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</body>
+</html>

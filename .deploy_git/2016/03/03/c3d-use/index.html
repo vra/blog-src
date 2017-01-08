@@ -1,0 +1,750 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>C3D Usage Summary | Yunfeng&#39;s Hexo Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Yunfeng Wang">
+    
+
+    
+    <meta name="description" content="C3D is a deep learning tool which is modified version of BVLC caffe to support 3D convolution and pooling. it was released by Facebook. In the field of human action recognition, C3D feature of video c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C3D Usage Summary">
+<meta property="og:url" content="http://vra.github.io/2016/03/03/c3d-use/index.html">
+<meta property="og:site_name" content="Yunfeng's Hexo Blog">
+<meta property="og:description" content="C3D is a deep learning tool which is modified version of BVLC caffe to support 3D convolution and pooling. it was released by Facebook. In the field of human action recognition, C3D feature of video c">
+<meta property="og:updated_time" content="2017-01-08T09:23:44.618Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C3D Usage Summary">
+<meta name="twitter:description" content="C3D is a deep learning tool which is modified version of BVLC caffe to support 3D convolution and pooling. it was released by Facebook. In the field of human action recognition, C3D feature of video c">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Yunfeng&#39;s Hexo Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/author.jpg">
+    
+    
+    <link rel="apple-touch-icon" href="/img/logo.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Yunfeng&#39;s Hexo Blog" title="Yunfeng&#39;s Hexo Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Yunfeng&#39;s Hexo Blog">Yunfeng&#39;s Hexo Blog</a></h1>
+				<h2 class="blog-motto">Life is the process of learning</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					<li>
+						<a href="/atom.xml">RSS</a>
+					</li>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/03/03/c3d-use/" title="C3D Usage Summary" itemprop="url">C3D Usage Summary</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Yunfeng Wang" target="_blank" itemprop="author">Yunfeng Wang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-03-03T09:34:05.000Z" itemprop="datePublished"> 发表于 2016-03-03</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-_Compile_C3D"><span class="toc-number">1.</span> <span class="toc-text">1. Compile C3D</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-_Use_C3D_to_extract_feature_of_UCF101_video_dataset"><span class="toc-number">2.</span> <span class="toc-text">2. Use C3D to extract feature of UCF101 video dataset</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-_Train_3D_convolution_neural_network"><span class="toc-number">3.</span> <span class="toc-text">3. Train 3D convolution neural network</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Classify_C3D_feature_using_SVM"><span class="toc-number">4.</span> <span class="toc-text">4.Classify C3D feature using SVM</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Reference"><span class="toc-number">5.</span> <span class="toc-text">5.Reference</span></a></li></ol>
+		
+		</div>
+		
+		<p><a href="https://github.com/facebook/C3D" target="_blank" rel="external">C3D</a> is a deep learning tool which is modified version of BVLC <a href="https://github.com/BVLC/caffe" target="_blank" rel="external">caffe</a> to support 3D convolution and pooling. it was released by Facebook. In the field of human action recognition, C3D feature of video clip is the state-of-the-art feature. In this blog, I write some notes for using this tool in practice.<br><a id="more"></a></p>
+<h2 id="1-_Compile_C3D">1. Compile C3D</h2><ol>
+<li><p>Clone C3D from github:</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="keyword">clone</span> <span class="title">https</span>://github.com/facebook/C3D.git</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Compile it:</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cp Makefile<span class="class">.config</span><span class="class">.example</span> Makefile<span class="class">.config</span></span><br><span class="line"><span class="hexcolor">#ada</span>pt makefile according to configuration of your machine, <span class="keyword">for</span> example, change atblas to mkl</span><br><span class="line">make all -j <span class="number">32</span></span><br></pre></td></tr></table></figure>
+<p><code>-j 32</code> means use 32 cores to compile it in parallel.</p>
+<p>When something goes wrong, search the Internet, find a solution and update your makefile.    </p>
+</li>
+<li><p>Test whether the compilation is finished correctly.  </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#assume you are at C3D root directory right now  </span></span><br><span class="line"><span class="built_in">cd</span> examples/c3d_feature_extraction  </span><br><span class="line"><span class="comment">#download trained sport1m caffemodel from net  </span></span><br><span class="line">sh c3d_sport1m_feature_extraction_frm.sh</span><br></pre></td></tr></table></figure>
+<p>  If the command above runs correctly, your compilation is successful!  </p>
+</li>
+</ol>
+<h2 id="2-_Use_C3D_to_extract_feature_of_UCF101_video_dataset">2. Use C3D to extract feature of UCF101 video dataset</h2><ol>
+<li><p>Get the dataset and write list files<br> First download UCF101 dataset from <a href="http://crcv.ucf.edu/data/UCF101.php" target="_blank" rel="external">http://crcv.ucf.edu/data/UCF101.php</a>, and then write list files.</p>
+<p> Since C3D can read video clips and frames of videos, you can write input list file and output list file in both way.</p>
+<p> For frame format, you need  to transform video to frames firstly, I use ffmpeg to do this job:</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -<span class="tag">i</span> <span class="string">"/path/to/video"</span> <span class="string">"/path/to/frm/dir/%06d.jpg"</span></span><br></pre></td></tr></table></figure>
+<p> The input list file contains the paths to video clips or frames, the output list file contains the path where to save the features.</p>
+<p> The format of input list file is like this:  </p>
+<p> <code>&lt;string_path&gt; &lt;starting_frame&gt; &lt;label&gt;</code>  </p>
+<p> for example, <code>/home/yunfeng/dataset/ucf101/ucf101_frm/YoYo/v_YoYo_g23_c01/ 1 100</code><br> <strong>NOTE: for video clip, <code>starting_frame</code> starts from 0, but for frames, it starts from 1.</strong>  </p>
+<p> the format of output list file is like this:<br> <code>&lt;output_folder&gt;</code><br> for example, <code>/output/c3d/YoYo//v_YoYo_g23_c01/000001</code>  </p>
+</li>
+<li><p>Create output directory YOURSElF<br> <strong>NOTE: C3D does not create directories in output list file, you must create them yourself.</strong>  </p>
+<p> There is a simple way: since we have path to target directory in output list file, we can use it:  </p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="id">#assume</span> you are at C3D root directory <span class="attribute">right</span> now</span><br><span class="line"><span class="number">1</span>. cd examples/c3d_feature_extraction</span><br><span class="line"><span class="number">2</span>. cp prototxt/output_list_prefix<span class="class">.txt</span> create_dir<span class="class">.sh</span></span><br><span class="line"><span class="number">3</span>. vi create_dir.sh</span><br></pre></td></tr></table></figure>
+<p> In vi, do two steps to change diretories to shell commands:</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">:0,$s/\/\d\+/\//g # remove the number at the <span class="operator"><span class="keyword">end</span> <span class="keyword">of</span> <span class="keyword">each</span> line.</span><br><span class="line">:<span class="number">0</span>,$s/<span class="keyword">output</span>/mkdir -<span class="keyword">p</span> <span class="keyword">output</span>/<span class="keyword">g</span> # <span class="keyword">add</span> <span class="string">`mkdir -p`</span> command <span class="keyword">at</span> the <span class="keyword">head</span> <span class="keyword">of</span> <span class="keyword">each</span> line.</span></span><br></pre></td></tr></table></figure>
+<p> then run the command to create directories:</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">sh</span> create_dir.<span class="keyword">sh</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Use tools to extract features<br>After finishing first step, you need to write a prototxt file. Fortunately, there is a example file in the directory: <code>prototxt/c3d_sport1m_feature_extractor_frm.prototxt</code>, you can adapt it to have right access to input list file.  </p>
+<p>We use tool named <code>extract_image_features.bin</code> in <code>build/tools</code> directory to extract features, the usage of it is </p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> extract_image_features.bin <span class="tag">&lt;<span class="title">feature_extractor_prototxt_file</span>&gt;</span> </span><br><span class="line"><span class="tag">&lt;<span class="title">c3d_pre_trained_model</span>&gt;</span> <span class="tag">&lt;<span class="title">gpu_id</span>&gt;</span> <span class="tag">&lt;<span class="title">mini_batch_size</span>&gt;</span> </span><br><span class="line"><span class="tag">&lt;<span class="title">number_of_mini_batches</span>&gt;</span> <span class="tag">&lt;<span class="title">output_prefix_file</span>&gt;</span> <span class="tag">&lt;<span class="title">feature_name1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">feature_name2</span>&gt;</span> ...</span><br></pre></td></tr></table></figure>
+<p>We can use command below to extract feature:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GLOG_logtosterr=<span class="number">1</span> ../../build/tools/extract_image_features.bin</span><br><span class="line">prototxt/c3d_sport1m_feature_extractor_frm.prototxt </span><br><span class="line">conv3d_deepnetA_sport1m_iter_1900000 <span class="number">0</span> <span class="number">50</span> <span class="number">1</span> </span><br><span class="line">prototxt/output_list_prefix.txt fc7­<span class="number">1</span> fc6­<span class="number">1</span> prob</span><br></pre></td></tr></table></figure>
+<p>After extraction of feature, we can use matlab code in <code>script</code> subdirectory of <code>example/c3d_feature_extraction</code> to do further job. There are two matlab files in <code>script</code>, <code>read_binary_blob.m</code>, <code>read_binary_blob_preserve_shape.m</code>. There are used to transform features into binary blob data, We can use these two functions for further analysis of features.</p>
+</li>
+</ol>
+<h2 id="3-_Train_3D_convolution_neural_network">3. Train 3D convolution neural network</h2><p>Since C3D is a fork of <a href="http://github.com/bvlc/caffe.git" target="_blank" rel="external">Caffe</a>, which is a fast open framework for deep learning, We can use C3D to train deep networks. You can train from scratch or fine-tune C3D on your own dataset.</p>
+<ol>
+<li><p>Train from scratch</p>
+<p>C3D offers some useful shell scripts to simplify our job, we can read the scripts and adapt it according our tasks.</p>
+<p><strong>NOTE: you must adapt the shell scripts to ensure that every parameter is correct for your task!</strong></p>
+<p>the schedule of training from scratch is(assuming we are training on ucf101):</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#assume you are at C3D root directory right now</span></span><br><span class="line"><span class="number">1</span>. <span class="built_in">cd</span> examples/c3d_train_ucf101</span><br><span class="line"><span class="number">2</span>. sh create_volume_means.sh <span class="comment"># compute the mean file of your dataset</span></span><br><span class="line"><span class="number">3</span>. sh train_ucf101.sh <span class="comment"># train from scratch </span></span><br><span class="line"><span class="number">4</span>. <span class="built_in">test</span>_ucf101.sh <span class="comment"># test the accuracy of training</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Fine-Tune on C3D</p>
+<p> First you have to download pretrained model, then you can do fine-tuning like this:</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#assume you are at C3D root directory <span class="keyword">right</span> now</span><br><span class="line"><span class="number">1</span>. <span class="keyword">cd</span> examples/c3d_finetuning</span><br><span class="line"><span class="number">2</span>. <span class="keyword">sh</span> ucf101_finetuning.<span class="keyword">sh</span></span><br><span class="line"><span class="number">3</span>. <span class="keyword">sh</span> ucf101_testing.<span class="keyword">sh</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="4-Classify_C3D_feature_using_SVM">4.Classify C3D feature using SVM</h2><p>After extracting features for batchs in each video using C3D tools, in orde to use SVM to classify the videos, we must get a descriptor for each video. We average the c3d features for each video, i.e., sum up those 4096 dimension’s data and calculate the mean of them. I use matlab code below to do this job(using offered funtion <code>read_binary_blob</code>):</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[]</span>= <span class="title">read_ucf101_c3d_feat</span><span class="params">(output_list_relative)</span></span></span><br><span class="line"><span class="comment">% Read c3d features (fc6) for videos in ucf101 dataset.</span></span><br><span class="line"><span class="comment">% For each video, average all its features and get a video descriptor.</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">% rather than fileread, importdata save each line separetely.</span></span><br><span class="line">    dir_list = importdata(output_list_relative);</span><br><span class="line"></span><br><span class="line">    dim_feat = <span class="number">4096</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span> : <span class="built_in">size</span>(dir_list, <span class="number">1</span>)</span><br><span class="line">        dir_str = char(dir_list(<span class="built_in">i</span>));</span><br><span class="line">        feat_files = dir(<span class="matrix">[dir_str, <span class="string">'/*.fc6-1'</span>]</span>);</span><br><span class="line">        num_feat = <span class="built_in">length</span>(feat_files);</span><br><span class="line">        feat = <span class="built_in">zeros</span>(num_feat, dim_feat);</span><br><span class="line">        <span class="keyword">for</span> <span class="built_in">j</span> = <span class="number">1</span> : num_feat</span><br><span class="line">            feat_path = strcat(dir_str, <span class="string">'/'</span>, feat_files(<span class="built_in">j</span>).name);</span><br><span class="line">            <span class="matrix">[~, feat(j,:)]</span> = read_binary_blob(feat_path);</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">        avg_feat = mean(feat, <span class="number">1</span>);</span><br><span class="line">        avg_feat_double = double(avg_feat);</span><br><span class="line">        fID = fopen(strcat(dir_str, <span class="string">'/c3d.fc6'</span>), <span class="string">'w'</span>);</span><br><span class="line">		<span class="comment">% libsvm requires that input data must be double</span></span><br><span class="line">        fwrite(fID, avg_feat_double, <span class="string">'double'</span>);</span><br><span class="line">        fclose(fID);</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>The input parameter is the file each line is a relative path to each video frames from the location of script. for example:</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">..<span class="regexp">/output/</span>c3d<span class="regexp">/ApplyEyeMakeup/</span>v_ApplyEyeMakeup_g01_c01</span><br></pre></td></tr></table></figure>
+<p>It takes about ten minutes to run this script.  </p>
+<p>When use libsvm to classify video features, there are two phases: training and testing. The declaration of training and testing functions are: </p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">model = libsvmtrain(train_label_vector, train_data_matrix, options);</span><br><span class="line"><span class="matrix">[label, accuracy, prob]</span> = libsvmpredict(test_label_vector, test_data_matrix, model, options);</span><br></pre></td></tr></table></figure>
+<p><code>train_label_vector</code> is a m by 1 vector, each element is a double value. <code>train_data_matrix</code> is a m by n matrix, each row is the data of one video. It is similar for predicting function.  </p>
+<p>In order to construct input data in right way, I write several  wrapper functions for training and testing, which is more convenient to running:</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">% create_svm_input_data.m</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[data_matrix]</span> = <span class="title">create_svm_input_data</span><span class="params">(output_list_train)</span></span></span><br><span class="line"><span class="comment">% read the c3d feature(fc6) for each video, construct libsvm format data.</span></span><br><span class="line"></span><br><span class="line">    dim_feat = <span class="number">4096</span>;</span><br><span class="line">    dir_list = importdata(output_list_train);</span><br><span class="line">    num_train_video = <span class="built_in">size</span>(dir_list, <span class="number">1</span>);</span><br><span class="line">    data_matrix = <span class="built_in">zeros</span>(num_train_video, dim_feat);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span> : num_train_video</span><br><span class="line">        feat_path = strcat(char(dir_list(<span class="built_in">i</span>)), <span class="string">'/c3d.fc6'</span>);</span><br><span class="line">        fid = fopen(feat_path, <span class="string">'r'</span>);</span><br><span class="line">        data = fread(fid, <span class="string">'double'</span>);</span><br><span class="line">        fclose(fid);</span><br><span class="line"></span><br><span class="line">        normed_data = data / norm(data);</span><br><span class="line">        data_matrix(<span class="built_in">i</span>, :) = normed_data;</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>The <code>output_list_train</code> is the file contains relative path to each video directory. like:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">../output/c3d/YoYo/v_YoYo_g07_c02</span><br></pre></td></tr></table></figure></p>
+<p>And then there is the file to train svm:<br><figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">%% train_ucf101.m</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[model]</span> = <span class="title">train_ucf101</span><span class="params">(label_file_path, data_file_path, varargin)</span></span></span><br><span class="line">    label_int = load(label_file_path);</span><br><span class="line">    label_double = double(label_int);</span><br><span class="line">    data = create_svm_input_data(data_file_path);</span><br><span class="line">    model = libsvmtrain(label_double, data, varargin<span class="cell">&#123;:&#125;</span>);</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></p>
+<p>The <code>label_file_path</code> is the complete path to the file contains all training labels, including the file name, for example, <code>label_file_path</code> can be:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/data/foo/training_label.txt</span><br></pre></td></tr></table></figure></p>
+<p>And each line in <code>training_label.txt</code> contains only one label, for example:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># training_label.txt</span></span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="number">0</span></span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>There is the matlab file to test svm:</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">%% test_ucf101.m</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[label, accuracy, predict_prob]</span> = <span class="title">test_ucf101</span><span class="params">(test_label_path, test_data_path, model, varargin)</span></span></span><br><span class="line">    label_int = load(test_label_path);</span><br><span class="line">    label_double = double(label_int);</span><br><span class="line">    label_size = <span class="built_in">size</span>(label_double)</span><br><span class="line">    data = create_svm_input_data(test_data_path);</span><br><span class="line">    data_size = <span class="built_in">size</span>(data)</span><br><span class="line">    <span class="matrix">[label, accuracy, predict_prob]</span> = libsvmpredict(label_double, data, model, varargin<span class="cell">&#123;:&#125;</span>);</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>Note we can use <code>varagin</code> to pass parameters from a wrapper function to an internal function.</p>
+<h2 id="5-Reference">5.Reference</h2><ol>
+<li><a href="https://docs.google.com/document/d/1-QqZ3JHd76JfimY4QKqOojcEaf5g3JS0lNh-FHTxLag/edit" target="_blank" rel="external">C3D User Guide</a>.</li>
+<li><a href="https://www.csie.ntu.edu.tw/~cjlin/libsvm/" target="_blank" rel="external">LIBSVM</a>.</li>
+</ol>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Caffe/">Caffe</a><a href="/tags/DeepLearning/">DeepLearning</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://vra.github.io/2016/03/03/c3d-use/" data-title="C3D Usage Summary | Yunfeng&#39;s Hexo Blog" data-tsina="5582731363" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/03/29/markdown-note/" title="markdown易错点总结">
+  <strong>上一篇：</strong><br/>
+  <span>
+  markdown易错点总结</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2016/01/17/default-deleted/"  title="c++11新特性：default和delete">
+ <strong>下一篇：</strong><br/> 
+ <span>c++11新特性：default和delete
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2016/03/03/c3d-use/" data-title="C3D Usage Summary" data-url="http://vra.github.io/2016/03/03/c3d-use/"></div>
+</section>
+
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-_Compile_C3D"><span class="toc-number">1.</span> <span class="toc-text">1. Compile C3D</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-_Use_C3D_to_extract_feature_of_UCF101_video_dataset"><span class="toc-number">2.</span> <span class="toc-text">2. Use C3D to extract feature of UCF101 video dataset</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-_Train_3D_convolution_neural_network"><span class="toc-number">3.</span> <span class="toc-text">3. Train 3D convolution neural network</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Classify_C3D_feature_using_SVM"><span class="toc-number">4.</span> <span class="toc-text">4.Classify C3D feature using SVM</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Reference"><span class="toc-number">5.</span> <span class="toc-text">5.Reference</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/学习总结/C/" title="C++">C++<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/OpenCV/" title="OpenCV">OpenCV<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Sublime-Text/" title="Sublime Text">Sublime Text<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/四季风物/" title="四季风物">四季风物<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/" title="学习总结">学习总结<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/我们的记录/" title="我们的记录">我们的记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/朝花夕拾/" title="朝花夕拾">朝花夕拾<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/未分类/" title="未分类">未分类<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/速记/" title="速记">速记<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Linux/" title="Linux">Linux<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C++">C++<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/学习总结/" title="学习总结">学习总结<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/并行计算/" title="并行计算">并行计算<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python/" title="Python">Python<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Caffe/" title="Caffe">Caffe<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Sublime-Text/" title="Sublime Text">Sublime Text<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/GPU/" title="GPU">GPU<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/总结/" title="总结">总结<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web编程/" title="Web编程">Web编程<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CUDA/" title="CUDA">CUDA<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Nvidia/" title="Nvidia">Nvidia<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Shell/" title="Shell">Shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/博客备忘/" title="博客备忘">博客备忘<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/matlab/" title="matlab">matlab<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/asciinema/" title="asciinema">asciinema<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Make/" title="Make">Make<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/机器学习-总结/" title="机器学习 总结">机器学习 总结<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/Apache/" style="font-size: 10px;">Apache</a> <a href="/tags/C/" style="font-size: 20px;">C++</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CUDA/" style="font-size: 12px;">CUDA</a> <a href="/tags/Caffe/" style="font-size: 14px;">Caffe</a> <a href="/tags/Deep-Learning/" style="font-size: 10px;">Deep Learning</a> <a href="/tags/DeepLearning/" style="font-size: 10px;">DeepLearning</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/GPU/" style="font-size: 14px;">GPU</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Make/" style="font-size: 10px;">Make</a> <a href="/tags/Nvidia/" style="font-size: 10px;">Nvidia</a> <a href="/tags/OpenMP/" style="font-size: 10px;">OpenMP</a> <a href="/tags/PIL/" style="font-size: 10px;">PIL</a> <a href="/tags/Python/" style="font-size: 14px;">Python</a> <a href="/tags/Shell/" style="font-size: 10px;">Shell</a> <a href="/tags/Siamese-Network/" style="font-size: 10px;">Siamese Network</a> <a href="/tags/Spark/" style="font-size: 10px;">Spark</a> <a href="/tags/Sublime-Text/" style="font-size: 14px;">Sublime Text</a> <a href="/tags/Web编程/" style="font-size: 12px;">Web编程</a> <a href="/tags/Wordpress/" style="font-size: 10px;">Wordpress</a> <a href="/tags/asciinema/" style="font-size: 10px;">asciinema</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/matlab/" style="font-size: 10px;">matlab</a> <a href="/tags/博客备忘/" style="font-size: 10px;">博客备忘</a> <a href="/tags/图像处理/" style="font-size: 10px;">图像处理</a> <a href="/tags/学习总结/" style="font-size: 18px;">学习总结</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/并行计算/" style="font-size: 16px;">并行计算</a> <a href="/tags/总结/" style="font-size: 12px;">总结</a> <a href="/tags/机器学习-总结/" style="font-size: 10px;">机器学习 总结</a> <a href="/tags/深度学习/" style="font-size: 10px;">深度学习</a> <a href="/tags/计算机视觉/" style="font-size: 12px;">计算机视觉</a> <a href="/tags/速记/" style="font-size: 10px;">速记</a>
+    </div>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://cra.blog.ustc.edu.cn" target="_blank" title="他年得傍蟾宫客">他年得傍蟾宫客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=5582731363&verifier=db8de729&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Yunfeng Wang in USTC <br/>
+			This is my blog, keep thinking, keep working</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/5582731363" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/vra" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		<a href="http://stackoverflow.com/users/2932001" target="_blank" class="icon-stack-overflow" title="stackoverflow"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Yunfeng Wang">Yunfeng Wang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"vra"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'yunfengshexoblog';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255298630'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255298630' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  <!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</body>
+</html>

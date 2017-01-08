@@ -1,0 +1,783 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Spark简介 | Yunfeng&#39;s Hexo Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Yunfeng Wang">
+    
+
+    
+    <meta name="description" content="概述这篇文章是我通过学习了Spark官网上的一些内容，参考了许多博客和文章，也尝试进行了一些初级的Spark编程后写的关于Spark的简要的说明，希望能讲明白Spark这个框架的一些原理，提供一个基础的入门教程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark简介">
+<meta property="og:url" content="http://vra.github.io/2016/06/16/spark/index.html">
+<meta property="og:site_name" content="Yunfeng's Hexo Blog">
+<meta property="og:description" content="概述这篇文章是我通过学习了Spark官网上的一些内容，参考了许多博客和文章，也尝试进行了一些初级的Spark编程后写的关于Spark的简要的说明，希望能讲明白Spark这个框架的一些原理，提供一个基础的入门教程。">
+<meta property="og:image" content="http://spark.apache.org/images/spark-logo-trademark.png">
+<meta property="og:image" content="http://spark.apache.org/docs/latest/img/cluster-overview.png">
+<meta property="og:image" content="http://img.ptcms.csdn.net/article/201511/25/5655b0ea512a8.jpg">
+<meta property="og:image" content="http://spark.apache.org/docs/latest/img/cluster-overview.png">
+<meta property="og:updated_time" content="2017-01-08T09:23:44.674Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spark简介">
+<meta name="twitter:description" content="概述这篇文章是我通过学习了Spark官网上的一些内容，参考了许多博客和文章，也尝试进行了一些初级的Spark编程后写的关于Spark的简要的说明，希望能讲明白Spark这个框架的一些原理，提供一个基础的入门教程。">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Yunfeng&#39;s Hexo Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/author.jpg">
+    
+    
+    <link rel="apple-touch-icon" href="/img/logo.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Yunfeng&#39;s Hexo Blog" title="Yunfeng&#39;s Hexo Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Yunfeng&#39;s Hexo Blog">Yunfeng&#39;s Hexo Blog</a></h1>
+				<h2 class="blog-motto">Life is the process of learning</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					<li>
+						<a href="/atom.xml">RSS</a>
+					</li>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/06/16/spark/" title="Spark简介" itemprop="url">Spark简介</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Yunfeng Wang" target="_blank" itemprop="author">Yunfeng Wang</a>
+		
+  <p class="article-time">
+    <time datetime="2016-06-16T13:24:30.000Z" itemprop="datePublished"> 发表于 2016-06-16</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#核心概念"><span class="toc-number">2.</span> <span class="toc-text">核心概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-_SparkContext"><span class="toc-number">3.</span> <span class="toc-text">1. SparkContext</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_RDD"><span class="toc-number">3.1.</span> <span class="toc-text">2. RDD</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_Action_v-s-_Transformation"><span class="toc-number">3.2.</span> <span class="toc-text">3. Action v.s. Transformation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_Lazy_Evalution"><span class="toc-number">3.3.</span> <span class="toc-text">4. Lazy Evalution</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_Closure"><span class="toc-number">3.4.</span> <span class="toc-text">5. Closure</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-_Shuffle"><span class="toc-number">3.5.</span> <span class="toc-text">6. Shuffle</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-_Persistance"><span class="toc-number">3.6.</span> <span class="toc-text">7. Persistance</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-_Shared_Variables"><span class="toc-number">3.7.</span> <span class="toc-text">8. Shared Variables</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#集群模型"><span class="toc-number">4.</span> <span class="toc-text">集群模型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Cluster模型"><span class="toc-number">4.1.</span> <span class="toc-text">1. Cluster模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Cluster_Manager_类型"><span class="toc-number">4.2.</span> <span class="toc-text">2. Cluster Manager 类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_概念辨析"><span class="toc-number">4.3.</span> <span class="toc-text">3. 概念辨析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_资源监控"><span class="toc-number">4.4.</span> <span class="toc-text">4. 资源监控</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编程体验"><span class="toc-number">5.</span> <span class="toc-text">编程体验</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_下载Spark程序"><span class="toc-number">5.1.</span> <span class="toc-text">1. 下载Spark程序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_打开Python命令行"><span class="toc-number">5.2.</span> <span class="toc-text">2. 打开Python命令行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_读取Spark根目录下REAMDE-md中出现Spark这个单词的行数"><span class="toc-number">5.3.</span> <span class="toc-text">3. 读取Spark根目录下REAMDE.md中出现Spark这个单词的行数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_用Spark计算Pi（采用随机投点法）"><span class="toc-number">5.4.</span> <span class="toc-text">4. 用Spark计算Pi（采用随机投点法）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_在分布式环境下部署"><span class="toc-number">5.5.</span> <span class="toc-text">5. 在分布式环境下部署</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h2 id="概述">概述</h2><p>这篇文章是我通过学习了Spark官网上的一些内容，参考了许多博客和文章，也尝试进行了一些初级的Spark编程后写的关于Spark的简要的说明，希望能讲明白Spark这个框架的一些原理，提供一个基础的入门教程。  </p>
+<p><img src="http://spark.apache.org/images/spark-logo-trademark.png" alt="Spark logo">    </p>
+<a id="more"></a>
+<p>Spark是一个用于分布式数据处理和并行计算的开源项目，最早由UC Berkeley 的AMP 实验室开发，现在已经交由Apache开源项目组管理。Spark目前变得非常流行，跟其高效性，通用性和易于编程性都有很大关系。Spark在机器学习，大数据处理和实时数据处理，以及分布式的应用场景中都能充分发挥作用。  </p>
+<p><strong>Spark程序计算很快。</strong> 根据<a href="http://spark.apache.org/" target="_blank" rel="external">Spark主页</a>上的描述，Spark程序比基于Memory的<a href="http://hadoop.apache.org/" target="_blank" rel="external">Hadoop</a>(一个分布式系统基础架构)的MapReduce要快100倍，比基于硬盘的Hadoop MapReduce 快10倍。Spark之所以有如此快的速度，是因为采用了很多高效的方案，如采用懒惰模式，基于内存进行操作，对数据进行多种方式的缓存等等。  </p>
+<p><strong>Spark程序易于编写。</strong> Spark 原生是由Scala编写，现在支持Java，Scala，Python和R四种语言。这四种语言可以覆盖较大的开发者范围，像R是数据处理专家的拿手语言，而Java是Hadoop的开发语言，而且由于Spark对Hadoop的一定程度的兼容性，使得Hadoop开发者可以快速地转到Spark平台上来。而Python和Scala是现代化的编程语言，编程风格优雅，入门简单，所以开发者可以快速地开发出可以实际应用的程序。  </p>
+<p><strong>Spark统一了本地和分布式情形下的数据访问模式</strong>。在本地电脑上，Spark会开多个进程来模拟分布式环境下的任务计算，所以即使在单机环境下，开发者也可以编写适用于分布式环境的程序，这大大地简化了程序的调试难度，也进一步加快了项目的开发进程。另外，Spark提出了弹性分布式数据集（RDD， Resilient Distributed Dataset）的数据格式,这种格式的数据默认就是分布式分布地，但是操作方式却和本地操作方式一样，即替开发者完成了运算节点之间拷贝数据的操作，使得开发人员像编写本地程序一样来编写分布式程序，毫无疑问这是一个很大的优势。    </p>
+<p>上面是一些比较大范围的说明，而我个人对Spark比较向往的地方则是相比Hadoop，Spark上手很容易，官网上提供的教程和说明非常详尽，自己写一个计算$\pi$的程序只需要以下几行Python代码即可完成（代码来自Spark官方给出的例子）：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">from</span> random <span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">from</span> operator <span class="keyword">import</span> add</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pyspark <span class="keyword">import</span> SparkContext</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    <span class="string">"""</span><br><span class="line">        Usage: pi [partitions]</span><br><span class="line">    """</span></span><br><span class="line">    sc = SparkContext(appName=<span class="string">"PythonPi"</span>)</span><br><span class="line">    partitions = int(sys.argv[<span class="number">1</span>]) <span class="keyword">if</span> len(sys.argv) &gt; <span class="number">1</span> <span class="keyword">else</span> <span class="number">2</span></span><br><span class="line">    n = <span class="number">100000</span> * partitions</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">(_)</span>:</span></span><br><span class="line">        x = random() * <span class="number">2</span> - <span class="number">1</span></span><br><span class="line">        y = random() * <span class="number">2</span> - <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span> <span class="keyword">if</span> x ** <span class="number">2</span> + y ** <span class="number">2</span> &lt; <span class="number">1</span> <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    count = sc.parallelize(range(<span class="number">1</span>, n + <span class="number">1</span>), partitions).map(f).reduce(add)</span><br><span class="line">    print(<span class="string">"Pi is roughly %f"</span> % (<span class="number">4.0</span> * count / n))</span><br><span class="line"></span><br><span class="line">    sc.stop()</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，核心代码不超过10行。    </p>
+<p>而为了配置Hadoop，我花了2天的时间，也还没有搞好，实在是对入门者不够友好。此外Java编写的程序和XML编写的配置文件一开始就有一种很“重”的感觉，使人望而却步。   </p>
+<p>上面这部分内容是关于Spark的一个大概的介绍，<strong>下面，我将从核心概念，集群模型和编程体验这三个大的方向进行详细的说明和我的理解。注意：下面的示例都以Spark的Python API为例。</strong></p>
+<h2 id="核心概念">核心概念</h2><h2 id="1-_SparkContext">1. SparkContext</h2><p>Spark是管理集群和协调集群进程的对象。SparkContext就像任务的分配和总调度师一样，处理数据分配，任务切分这些任务。下图是Spark官网给出的集群之间的逻辑框架图，可以看到SparkContext在Driver程序中运行，这里的Driver就是主进程的意思。Worker Node就是集群的计算节点，计算任务在它们上完成。<br><img src="http://spark.apache.org/docs/latest/img/cluster-overview.png" alt="Spark集群逻辑框架"></p>
+<p>Spark提供了Scala和Python的交互式命令环境，里面默认会创建一个<code>SparkContext</code>变量，并将其重命名为<code>sc</code>，所以在交互式环境下，可以用<code>sc</code>来方便地调用<code>SparkContext</code>的函数集合。下面示例中采用<code>sc</code>来代表<code>SparkContext</code>。  </p>
+<h3 id="2-_RDD">2. RDD</h3><p>RDD是Resilient Distributed Datasets的缩写，中文翻译为弹性分布式数据集，它是Spark的数据操作元素，是具有容错性的并行的基本单元。<strong>RDD之于Spark，就相当于array之于Numpy，Matrix之于MatLab，DataFrames之于Pandas。</strong> 很重要的一个点是：RDD天然就是在分布式机器上存储的，比如对于下面这个RDD数据,可能Data1-3是存储在节点1的，Data4-6是存储节点2的，后面的数据也是这样，存储在集群中不同的机器上的。这种碎片化的存储使得任务的并行变得容易。    </p>
+<p><img src="http://img.ptcms.csdn.net/article/201511/25/5655b0ea512a8.jpg" alt="RDD data"></p>
+<p>RDD生成也很容易，可以由串行的List， Tuple等等来生成，如：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">data = [<span class="number">1</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">7</span>,<span class="number">9</span>]</span><br><span class="line">dist_data = sc.parallelize(data)</span><br></pre></td></tr></table></figure></p>
+<p>这两行代码就可以将串行的数据转换为并行的RDD。  </p>
+<p>另一种生成RDD的方法是从外部的存储系统进行引用，如可以从硬盘上的文件（像‘data.txt’）,HDFS文件系统，HBase数据库，或者任何的提供Hadoop的InputFormat格式的数据来源都可以。对于各种格式的数据，Spark都有专门的处理函数，像<code>textFile</code>用来读取硬盘上的文本文件，按行返回文本中的内容；而<code>newAPIHadoopRDD</code>函数则可以保存/读取符合Haddoop输出/输入格式的文件。具体使用规则请参考<a href="http://spark.apache.org/docs/latest/programming-guide.html" target="_blank" rel="external">Spark编程指南</a>。  </p>
+<h3 id="3-_Action_v-s-_Transformation">3. Action v.s. Transformation</h3><p>RDD支持2种操作，一种是<code>Transformation</code>，这种操作的结果是生成一个新的RDD对象，即由RDD生成RDD，如Transformation操作<code>map</code>，就是对RDD中的每个数据，对应生成map函数中定义的数据，最后得到的还是一个RDD。举个具体的例子，假设map函数是：对RDD中的每个数据加1，假设原先的数据是[1,3,5,7,9],则这个map函数作用的结果是[2,4,6,8,10],仍然是个RDD（注意：这里为了方便解释，将RDD写出Python中的List形式，实际上要记得这里的RDD数据是保存在不同机器上的）。另一种操作叫做<code>Action</code>，这种操作的结果是得到一个值(Value)。即由RDD得到Value。如Action操作<code>reduce</code>，假设reduce函数设定为：求RDD中所有元素的和，则对该RDD作用reduce的结果是30,为一个值。  </p>
+<p>常见的<code>Tranformation</code>操作包括<code>map，filter，flatMap,mapPartions, mapPartitionsWithIndex, sample, union, intersection, distinct, groupByKey, reduceByKey, aggregateByKey, sortByKey, join, pipe</code>等。<br>常见的<code>Action</code>操作包括<code>reduce，collect，count，first，take，takeSampke， takeOrdered， countByKey, foreach</code>等等。  </p>
+<h3 id="4-_Lazy_Evalution">4. Lazy Evalution</h3><p>Spark采用了惰性计算。所谓惰性计算，即对所有<code>transformation</code>，不会立即执行，而是等到某个<code>action</code>作用的时候，需要向Driver发送结果的时候再执行之前的所有<code>transformation</code>。简单来说，就是所有任务都拖到不能再拖的时候再执行。  </p>
+<p>惰性计算能提高Spark运行的性能。试想，如果对所有的<code>transformation</code>操作，立即计算，然后向Dirver返回结果，则需要发送数目巨大的数据集；而如果采用惰性计算，则只需发送最后的一个值给Driver，传输开销会大大地减小。  </p>
+<p><strong>需要指出的是：在Spark中，所有<code>transformation</code>操作都采用惰性模式，而所有<code>action</code>都是非惰性模式。</strong></p>
+<h3 id="5-_Closure">5. Closure</h3><p>在Spark中执行某一项任务的时候，Spark driver程序会将RDD的的操作分配到各个计算节点上，Spark称这些计算节点为<code>executor</code>。而每个executor执行计算的变量和操作就称为这个executor的<code>Closure</code>。  </p>
+<p>需要注意的是，各个executor的closure是不同的，刚开始的时候数据都从driver程序中克隆过来，之后这些数据就和driver程序中的数据没有任何关系了。这里可以类比<code>fork</code>操作，子进程和父进程之间的数据是隔离的，互不影响的。  </p>
+<p><strong>由于各个executor和driver的数据是不同的，所以涉及到不同节点上同名变量的运算，结果结果是不确定的，也不要依赖于该运算结果。</strong></p>
+<h3 id="6-_Shuffle">6. Shuffle</h3><p>在Spark中，有的时候为了执行某一个操作，需要从多个节点获取数据到一个节点，然后进行计算。计算后将计算结果再传给相应的计算节点。这个过程中，计算前后对应节点的数据是对应的，即节点1的计算结果还是返回到节点1,但是返回的顺序可能发生了改变，如节点1原先顺序是[2,3,4],可能结果是按[3,2,4]的计算结果返回的，这样就间接地完成了一个打乱顺序的操作，在Spark中称以上这个过程为<code>shuffle</code>。</p>
+<p>由上述描述可以看出来，Shuffle操作是一个开销比较大的操作，需要较大量的硬盘IO，数据串行化操作，和网络IO。此外，为了在单个节点保存多个节点上传过来的数据，还需要消耗较大的内存空间。  </p>
+<p>此外，Spark内部会隐式地<strong>在硬盘上</strong>保存该过程中产生的中间文件，以便于以后再次使用。过一定时间后，或者数据不再使用时，垃圾回收机器（GC，Garbage Collection）就会删除这些文件。由于GC回收的时间间隔会比较长，所以在运行Spark的过程中会产生很多的中间数据，占据很多的硬盘空间，所以Spark快，是以占据大量内存空间和磁盘空间作为代价的。  </p>
+<h3 id="7-_Persistance">7. Persistance</h3><p>为了加快运行的速度，Spark提供了<code>persist</code>和<code>cache</code>函数由开发者来显式地缓存RDD数据。在初次执行某个<code>action</code>的时候，对RDD数据进行缓存，在以后的<code>action</code>操作中，直接读取缓存的RDD数据。这样下来，<code>action</code>的执行速度可以提升10倍。<br>Spark的缓存具有容错性，如果一个节点的RDD数据部分丢失了，则Spark会根据生成该部分RDD数据的<code>transformation</code>重新生成完全一样的数据。  </p>
+<p>此外，Spark还允许设置不同的缓存存储级别（<code>StorageLevel</code>），如只缓存在内存中（<code>MEMORY_ONLY</code>），缓存在内存和硬盘中（<code>MEMORY_AND_DISK</code>），等等。这些参数可以通过<code>persist</code>函数进行设置。而<code>cache</code>函数则是<code>persist</code>函数指定<code>StorageLevel</code>为<code>MEMORY_ONLY</code>时的简写。    </p>
+<p>本质上StorageLevel的选取，是在内存占用量和CPU高效性之间的平衡。Spark官方文档中推荐使用<code>MEMORY_ONLY</code>，如果不行，可以选用<code>MEMROY_ONLY_SER</code>，这中方式类似于前者，只不过是串行存储以节省开销。一般不建议用<code>DISK</code>相关的存储。  </p>
+<p>Spark会自动监控缓存数据的使用情况，如果空间不够的话，就会使用最近使用次数最少算法（LRU，Least-Recently -Used）将部分缓存数据给删除掉。如果你想手动删除缓存，可以调用<code>RDD.unpersist()</code>函数。  </p>
+<h3 id="8-_Shared_Variables">8. Shared Variables</h3><p>通常情况下，当Driver程序给各个cluster节点分配后任务，复制完初始数据后，各个节点就在自己的本地空间上单独进行计算，再也不会和Driver程序之间发送数据了。但是为了几个非常常用的操作，Spark提供了2类共享变量：<code>broadcast variable</code>和<code>accumulator</code>。  </p>
+<p>broadcast变量是一种只读的变量，在driver进程需要向多个机器发送相同数据的时候会用到。并且规定boroadcast变量在广播后不可以被改变。我们可以对变量<code>v</code>进行broadcast操作，对其进行广播，然后在各个机器上使用的时候，使用<code>.value</code>来读取，而不是直接读取<code>v</code>的值。如下例：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">broadcastVar = sc.broadcast([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])</span><br><span class="line">broadcastVar.value </span><br><span class="line"><span class="comment">#结果：[1, 2, 3]</span></span><br></pre></td></tr></table></figure></p>
+<p>可以看到原理跟MPI里面的<code>MPI_Broadcast</code>函数的原理是比较类似的。  </p>
+<p>另一种共享变量是Accumulator，通过<code>SparkContext.accumulator(v)</code>函数初始化为<code>v</code>，然后可以通过将各个进程中的值增加到这个变量上面，然后计算得到相应的值。Spark内置了数值类型的Accumulator变量，开发者可以自己实现别的类型的Accumulator变量。其值也通过<code>value</code>属性来获得。下面是一个计算各个节点上数据之和的例子：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">accum = sc.accumulator(<span class="number">0</span>)</span><br><span class="line">sc.parallelize([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]).foreach(<span class="keyword">lambda</span> x: accum.add(x))</span><br><span class="line">accum.value </span><br><span class="line"><span class="comment">#结果：10</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="集群模型">集群模型</h2><p>结束了冗长而且枯燥的概念部分后，下面我来阐述一下关于Spark集群模型的一些理解。  </p>
+<h3 id="1-_Cluster模型">1. Cluster模型</h3><p><img src="http://spark.apache.org/docs/latest/img/cluster-overview.png" alt="Spark Cluster Model"><br>上图是官网给出的Spark集群模型，Driver Program 是主进程，SparkContext运行在它上面，它跟Cluster Manager相连。Driver对Cluster Manager下达任务人，然后由Cluster Manager将任资源分配给各个计算节点(Worker Node)上的<code>executor</code>，然后Driver再将应用的代码发送给各个Worker Node。最后，Driver向各个节点发送<code>Task</code>来运行。  </p>
+<p>这里有几个需要注意的点：</p>
+<blockquote>
+<ul>
+<li>在Spark中，各个应用之间数据是隔离的，即不同的SparkContext之间互不可见。这样能有效地保护数据的局部性。  </li>
+<li>Cluster Manager对Driver来说是不知的，透明的，只要能满足要求就可以。所以Spark可以在Mesos和YARN这些Cluster Manager上运行。  </li>
+<li>在运行过程中，Driver需要随时准备好接收来自各个计算节点的数据，所以对各个executor来说，Driver必须是可寻址的，比如有公网IP，或者如果在同一个局域网的话，有固定的局域网IP。  </li>
+<li>由于Driver需要随时接收消息和数据，所以最好Driver和各个节点比较邻近，这样数据传输会比较快。  </li>
+</ul>
+</blockquote>
+<h3 id="2-_Cluster_Manager_类型">2. Cluster Manager 类型</h3><p>当前Spark支持3种类型的Cluster Manager,分别是：</p>
+<blockquote>
+<ul>
+<li><code>Apache Mesos</code>： <a href="http://spark.apache.org/docs/latest/running-on-mesos.html" target="_blank" rel="external">Mesos</a>是一种通用的的集群管理系统，可以运行Hadoop和别的分布式计算。</li>
+<li><code>Hadoop YARN</code>: 这是Hadoop 2 默认的资源管理系统。</li>
+<li><code>Standalone</code>-这种类型是Spark单独设计的管理系统，比较简单，也没有太多的需要预先学习的东西。</li>
+</ul>
+</blockquote>
+<h3 id="3-_概念辨析">3. 概念辨析</h3><p>Spark集群模型有许多概念，之间的区别还是需要仔细辨析才能搞清楚。下面是从官方网站上抄录下来的一个定义，因为怕翻译后改变原意所以这里没有翻译，仅给出原文供参考：  </p>
+<blockquote>
+<ul>
+<li><code>Application</code> : User program built on Spark. Consists of a driver program and executors on the cluster.  </li>
+<li><code>Application jar</code> : A jar containing the user’s Spark application. In some cases users will want to create an “uber jar” containing their application along with its dependencies. The user’s jar should never include Hadoop or Spark libraries, however, these will be added at runtime.  </li>
+<li><code>Driver program</code> : The process running the main() function of the application and creating the SparkContext  </li>
+<li><code>Cluster manager</code> : An external service for acquiring resources on the cluster (e.g. standalone manager, Mesos, YARN)  </li>
+<li><code>Deploy mode</code> : Distinguishes where the driver process runs. In “cluster” mode, the framework launches the driver inside of the cluster. In “client” mode, the submitter launches the driver outside of the cluster.</li>
+<li><code>Worker node</code> : Any node that can run application code in the cluster</li>
+<li><code>Executor</code> : A process launched for an application on a worker node, that runs tasks and keeps data in memory or disk storage across them. Each application has its own executors.</li>
+<li><code>Task</code>: A unit of work that will be sent to one executor</li>
+<li><code>Job</code> : A parallel computation consisting of multiple tasks that gets spawned in response to a Spark action (e.g. save, collect); you’ll see this term used in the driver’s logs.</li>
+<li><code>Stage</code> : Each job gets divided into smaller sets of tasks called stages that depend on each other (similar to the map and reduce stages in MapReduce); you’ll see this term used in the driver’s logs.</li>
+</ul>
+</blockquote>
+<h3 id="4-_资源监控">4. 资源监控</h3><p>Spark在运行过程中，会在Driver程序所在机器的4040端口显示关于运行任务，存储情况和工作节点等等的Web UI。对于Standalone模式，在7070端口有类似的信息展示。开发者可以通过访问这个Web UI来了解更多信息。  </p>
+<p>集群模型就这些内容，下面以Python编程为例，展示Spark编程的风格和思路。  </p>
+<h2 id="编程体验">编程体验</h2><p>在这部分，我以WordCount 和计算PI这2个程序作为例子，描述如何用Python进行Spark编程。</p>
+<h3 id="1-_下载Spark程序">1. 下载Spark程序</h3><p>从<a href="http://spark.apache.org/downloads.html" target="_blank" rel="external">Spark官方下载页面</a>选择一个合适版本的Spark。建议在<code>package type</code>这一栏选择<code>Pre-built for Hadoop 2.x and later</code>，这样下载下来的版本会自带Hadoop相关的东西，不用自己单独再配Hadoop。<br>下载下来后，解压即可：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -xvf spark-*.tgz</span><br></pre></td></tr></table></figure></p>
+<h3 id="2-_打开Python命令行">2. 打开Python命令行</h3><p>进入解压后的目录，输入<code>./bin/pyspark</code>即可打开Python交互式窗口。这里会采用系统默认的Python交互式界面，如果想用体验更好的IPython交互式界面，则可以在输入命令之前设置如下环境变量：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PYSPARK_DRIVER_PYTHON=ipython ./bin/pyspark</span><br></pre></td></tr></table></figure></p>
+<p>然后输入<code>./bin/pyspark</code>即可进入IPython。<br>前面也提到过，在命令行下，SparkContext会自动创建好，并重命名为sc，所以下面可以直接使用sc来进行操作。  </p>
+<h3 id="3-_读取Spark根目录下REAMDE-md中出现Spark这个单词的行数">3. 读取Spark根目录下<code>REAMDE.md</code>中出现<code>Spark</code>这个单词的行数</h3><p>为了完成这个任务，我们首先读取<code>README.md</code>作为RDD数据。还记得RDD吗？这是Spark默认的处理类型，默认就是分布式存储的。读取本地文本文件使用<code>textFile</code>函数。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">readMeFile = sc.textFile(<span class="string">'README.md'</span>)</span><br></pre></td></tr></table></figure></p>
+<p>读进来的文件存在readMeFile这个RDD类型数据中，按行存储，其中每行就是<code>README.md</code>文件中的一行。<br>然后可以使用<code>filter</code>操作来获取满足条件的数据：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">linesWithSpark = readMeFile.filter(<span class="keyword">lambda</span> line : <span class="string">"Spark"</span> <span class="keyword">in</span> line)</span><br></pre></td></tr></table></figure></p>
+<p>这里<code>filter</code>函数返回满足里面lambda函数的新的RDD数据。lambda函数是Python中一种单行的函数，以一个语句来实现一个函数的功能。lambda后面紧跟的那个引号之前的变量为输入参数，引号后面的内容为输出结果，如：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">lambda</span> x, y : x + y</span><br></pre></td></tr></table></figure></p>
+<p>就是返回x和y之和的一个lambda函数。<br>要注意的是得到的RDD虽然是只包含字符串”Spark”的那些行，但还是分布式存储的。为了得到具体的行数，我们可以采用<code>count</code>函数：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">linesWithSpark.count()</span><br><span class="line"><span class="comment">#结果：15</span></span><br></pre></td></tr></table></figure></p>
+<p>此外，我们还可以把以上所有的<code>transformation</code>操作都以链式方式写在一起，如下：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">readMeFile.filter(<span class="keyword">lambda</span> line : <span class="string">"Spark"</span> <span class="keyword">in</span> line).count()</span><br></pre></td></tr></table></figure></p>
+<p>如果将上述代码写成单独的可执行的Python文件，内容将会是：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pyspark <span class="keyword">import</span> SparkContext</span><br><span class="line"></span><br><span class="line">sc = SparkContext(appName=<span class="string">"WordCount"</span>)</span><br><span class="line">readMeFile = sc.textFile(<span class="string">'README.md'</span>)</span><br><span class="line">readMeFile.filter(<span class="keyword">lambda</span> line : <span class="string">'Spark'</span> <span class="keyword">in</span> line).count()</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，很简单吧，下面我们继续来看用Spark来计算Pi值的例子。  </p>
+<h3 id="4-_用Spark计算Pi（采用随机投点法）">4. 用Spark计算Pi（采用随机投点法）</h3><p>所谓随机投点法，是根据圆和其外接正方形的面积之比为PI/4，因此我们可以统计在这个单位正方形内随机投点时，落入圆的比例为多少，投点数量足够多时，这个比例近似为PI/4,然后这个比例*4即为PI值。实际投点时，采取第一象限的[0,1]x[0,1]区域即可。<br>首先我们定义一个函数<code>f</code>,这个函数进行每次随机投点的统计，是否落在圆内，落在圆内返回1,否则返回0：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> random <span class="keyword">import</span> random</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">(_)</span>:</span></span><br><span class="line">    x = random() * <span class="number">2</span> - <span class="number">1</span></span><br><span class="line">    y = random() * <span class="number">2</span> - <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span> <span class="keyword">if</span> x ** <span class="number">2</span> + y ** <span class="number">2</span> &lt; <span class="number">1</span> <span class="keyword">else</span> <span class="number">0</span></span><br></pre></td></tr></table></figure></p>
+<p>之后，我们共进行10^6次试验，每次试验调用f函数，然后把所有结果相加，最后再*4/10^6即为PI的估计。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">n = <span class="number">10</span>**<span class="number">6</span></span><br><span class="line">count = sc.parallelize(range(<span class="number">1</span>,n+<span class="number">1</span>)).map(f).reduce(<span class="keyword">lambda</span> x, y : x + y)</span><br><span class="line">pi = <span class="number">4.0</span> * count / n</span><br><span class="line">print(<span class="string">'*****result: pi is :%f*****'</span> %(pi))</span><br></pre></td></tr></table></figure></p>
+<p>其中第2行为主要的计算任务，搞懂这一行的操作大概就能明白Spark是怎么工作的了。<br>将上述代码完成写出来，如下：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#file name: calc_pi.py</span></span><br><span class="line"><span class="keyword">from</span> pyspark <span class="keyword">import</span> SparkContext</span><br><span class="line"><span class="keyword">from</span> random <span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line">sc = SparkContext(appName=<span class="string">'CalcPi'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">(_)</span>:</span></span><br><span class="line">    x = random() * <span class="number">2</span> - <span class="number">1</span></span><br><span class="line">    y = random() * <span class="number">2</span> - <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span> <span class="keyword">if</span> x ** <span class="number">2</span> + y ** <span class="number">2</span> &lt; <span class="number">1</span> <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">n = <span class="number">10</span> ** <span class="number">6</span></span><br><span class="line">count = sc.parallelize(range(<span class="number">1</span>, n + <span class="number">1</span>)).map(f).reduce(<span class="keyword">lambda</span> x, y : x + y)</span><br><span class="line">pi = <span class="number">4.0</span> * count / n</span><br><span class="line"></span><br><span class="line">print(<span class="string">'*****result: pi is :%f*****'</span> %(pi))</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，内容很简洁，比MPI复杂的函数命名简洁多了。<br>之后，在Spark根目录中，使用如下命令开始运行Spark进行计算：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./bin/spark-submit calc_pi.py</span><br></pre></td></tr></table></figure></p>
+<p>可以看到会输出很多<code>INFO</code> 开头的信息，这里我将所有的输出都写下来，虽然内容很多，有些没有必要看，但我觉得如果仔细看这些输出的话，很能增加对Spark的理解，所以这里我还是不厌其烦地把所有输出信息都列出来了。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><span class="line">Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties</span><br><span class="line">16/05/16 21:33:56 INFO SparkContext: Running Spark version 1.6.1</span><br><span class="line">16/05/16 21:33:56 WARN NativeCodeLoader: Unable to <span class="operator"><span class="keyword">load</span> <span class="keyword">native</span>-hadoop <span class="keyword">library</span> <span class="keyword">for</span> your platform... <span class="keyword">using</span> builtin-<span class="keyword">java</span> classes <span class="keyword">where</span> applicable</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">56</span> WARN Utils: Your hostname, ustc resolves <span class="keyword">to</span> a loopback address: <span class="number">127.0</span><span class="number">.1</span><span class="number">.1</span>;</span> using 192.168.102.77 instead (on interface eth0)</span><br><span class="line">16/05/16 21:33:56 WARN Utils: <span class="operator"><span class="keyword">Set</span> SPARK_LOCAL_IP <span class="keyword">if</span> you need <span class="keyword">to</span> bind <span class="keyword">to</span> another address</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">56</span> INFO SecurityManager: Changing <span class="keyword">view</span> acls <span class="keyword">to</span>: yunfeng</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">56</span> INFO SecurityManager: Changing <span class="keyword">modify</span> acls <span class="keyword">to</span>: yunfeng</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">56</span> INFO SecurityManager: SecurityManager: <span class="keyword">authentication</span> disabled;</span> ui acls disabled; users with view permissions: <span class="operator"><span class="keyword">Set</span>(yunfeng);</span> u</span><br><span class="line">sers with modify permissions: <span class="operator"><span class="keyword">Set</span>(yunfeng)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">56</span> INFO Utils: Successfully started service <span class="string">'sparkDriver'</span> <span class="keyword">on</span> port <span class="number">53174.</span></span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">56</span> INFO Slf4jLogger: Slf4jLogger started</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">56</span> INFO Remoting: <span class="keyword">Starting</span> remoting</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">56</span> INFO Remoting: Remoting started;</span> listening on addresses :[akka.tcp://sparkDriverActorSystem@192.168.102.77:57025]</span><br><span class="line">16/05/16 21:33:56 INFO Utils: Successfully started service 'sparkDriverActorSystem' on port 57025.</span><br><span class="line">16/05/16 21:33:56 INFO SparkEnv: Registering MapOutputTracker</span><br><span class="line">16/05/16 21:33:57 INFO SparkEnv: Registering BlockManagerMaster</span><br><span class="line">16/05/16 21:33:57 INFO DiskBlockManager: Created local directory at /tmp/blockmgr-2ace648a-937b-4a4c-b984-6e4cd06b8273</span><br><span class="line">16/05/16 21:33:57 INFO MemoryStore: MemoryStore started with capacity 511.5 MB</span><br><span class="line">16/05/16 21:33:57 INFO SparkEnv: Registering OutputCommitCoordinator</span><br><span class="line">16/05/16 21:33:57 INFO Utils: Successfully started service 'SparkUI' on port 4040.</span><br><span class="line">16/05/16 21:33:57 INFO SparkUI: Started SparkUI at http://192.168.102.77:4040</span><br><span class="line">16/05/16 21:33:57 INFO Utils: Copying /home/yunfeng/Downloads/spark-1.6.1-bin-hadoop2.6/calc_pi.py to /tmp/spark-6cb08b18-143f-42dc-88c3-2778646</span><br><span class="line">0836b/userFiles-ae0a9fc0-65cf-467e-848b-4f3cf4e6e1c2/calc_pi.py</span><br><span class="line">16/05/16 21:33:57 INFO SparkContext: Added file file:/home/yunfeng/Downloads/spark-1.6.1-bin-hadoop2.6/calc_pi.py at file:/home/yunfeng/Download</span><br><span class="line">s/spark-1.6.1-bin-hadoop2.6/calc_pi.py with timestamp 1463405637243</span><br><span class="line">16/05/16 21:33:57 INFO Executor: Starting executor ID driver on host localhost</span><br><span class="line">16/05/16 21:33:57 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 43770.</span><br><span class="line">16/05/16 21:33:57 INFO NettyBlockTransferService: Server created on 43770</span><br><span class="line">16/05/16 21:33:57 INFO BlockManagerMaster: Trying to register BlockManager</span><br><span class="line">16/05/16 21:33:57 INFO BlockManagerMasterEndpoint: Registering block manager localhost:43770 with 511.5 MB RAM, BlockManagerId(driver, localhost</span><br><span class="line">, 43770)</span><br><span class="line">16/05/16 21:33:57 INFO BlockManagerMaster: Registered BlockManager</span><br><span class="line">16/05/16 21:33:57 INFO SparkContext: Starting job: reduce at /home/yunfeng/Downloads/spark-1.6.1-bin-hadoop2.6/calc_pi.py:12</span><br><span class="line">16/05/16 21:33:57 INFO DAGScheduler: Got job 0 (reduce at /home/yunfeng/Downloads/spark-1.6.1-bin-hadoop2.6/calc_pi.py:12) with 8 output partiti</span><br><span class="line">ons</span><br><span class="line">16/05/16 21:33:57 INFO DAGScheduler: Final stage: ResultStage 0 (reduce at /home/yunfeng/Downloads/spark-1.6.1-bin-hadoop2.6/calc_pi.py:12)</span><br><span class="line">16/05/16 21:33:57 INFO DAGScheduler: Parents of final stage: List()</span><br><span class="line">16/05/16 21:33:57 INFO DAGScheduler: Missing parents: List()</span><br><span class="line">16/05/16 21:33:57 INFO DAGScheduler: Submitting ResultStage 0 (PythonRDD[1] at reduce at /home/yunfeng/Downloads/spark-1.6.1-bin-hadoop2.6/calc_</span><br><span class="line">pi.py:12), which has no missing parents</span><br><span class="line">16/05/16 21:33:57 INFO MemoryStore: Block broadcast_0 stored as values in memory (estimated size 4.3 KB, free 4.3 KB)</span><br><span class="line">16/05/16 21:33:57 INFO MemoryStore: Block broadcast_0_piece0 stored as bytes in memory (estimated size 2.8 KB, free 7.1 KB)</span><br><span class="line">16/05/16 21:33:57 INFO BlockManagerInfo: Added broadcast_0_piece0 in memory on localhost:43770 (size: 2.8 KB, free: 511.5 MB)</span><br><span class="line">16/05/16 21:33:57 INFO SparkContext: Created broadcast 0 from broadcast at DAGScheduler.scala:1006</span><br><span class="line">16/05/16 21:33:57 INFO DAGScheduler: Submitting 8 missing tasks from ResultStage 0 (PythonRDD[1] at reduce at /home/yunfeng/Downloads/spark-1.6.</span><br><span class="line">1-bin-hadoop2.6/calc_pi.py:12)</span><br><span class="line">16/05/16 21:33:57 INFO TaskSchedulerImpl: Adding task <span class="operator"><span class="keyword">set</span> <span class="number">0.0</span> <span class="keyword">with</span> <span class="number">8</span> tasks</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> WARN TaskSetManager: Stage <span class="number">0</span> contains a task <span class="keyword">of</span> very <span class="keyword">large</span> <span class="keyword">size</span> (<span class="number">486</span> KB). The maximum recommended task <span class="keyword">size</span> <span class="keyword">is</span> <span class="number">100</span> KB.</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO TaskSetManager: <span class="keyword">Starting</span> task <span class="number">0.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">0</span>, localhost, <span class="keyword">partition</span> <span class="number">0</span>,PROCESS_LOCAL, <span class="number">497894</span> <span class="keyword">bytes</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO TaskSetManager: <span class="keyword">Starting</span> task <span class="number">1.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">1</span>, localhost, <span class="keyword">partition</span> <span class="number">1</span>,PROCESS_LOCAL, <span class="number">629219</span> <span class="keyword">bytes</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO TaskSetManager: <span class="keyword">Starting</span> task <span class="number">2.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">2</span>, localhost, <span class="keyword">partition</span> <span class="number">2</span>,PROCESS_LOCAL, <span class="number">629219</span> <span class="keyword">bytes</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO TaskSetManager: <span class="keyword">Starting</span> task <span class="number">3.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">3</span>, localhost, <span class="keyword">partition</span> <span class="number">3</span>,PROCESS_LOCAL, <span class="number">629219</span> <span class="keyword">bytes</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO TaskSetManager: <span class="keyword">Starting</span> task <span class="number">4.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">4</span>, localhost, <span class="keyword">partition</span> <span class="number">4</span>,PROCESS_LOCAL, <span class="number">629219</span> <span class="keyword">bytes</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO TaskSetManager: <span class="keyword">Starting</span> task <span class="number">5.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">5</span>, localhost, <span class="keyword">partition</span> <span class="number">5</span>,PROCESS_LOCAL, <span class="number">629219</span> <span class="keyword">bytes</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO TaskSetManager: <span class="keyword">Starting</span> task <span class="number">6.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">6</span>, localhost, <span class="keyword">partition</span> <span class="number">6</span>,PROCESS_LOCAL, <span class="number">629219</span> <span class="keyword">bytes</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO TaskSetManager: <span class="keyword">Starting</span> task <span class="number">7.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">7</span>, localhost, <span class="keyword">partition</span> <span class="number">7</span>,PROCESS_LOCAL, <span class="number">632117</span> <span class="keyword">bytes</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO Executor: Running task <span class="number">3.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">3</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO Executor: Running task <span class="number">1.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">1</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO Executor: Running task <span class="number">0.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">0</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO Executor: Running task <span class="number">6.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">6</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO Executor: Running task <span class="number">7.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">7</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO Executor: Running task <span class="number">2.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">2</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO Executor: Running task <span class="number">5.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">5</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO Executor: Running task <span class="number">4.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">4</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO Executor: Fetching <span class="keyword">file</span>:/home/yunfeng/Downloads/spark-<span class="number">1.6</span><span class="number">.1</span>-<span class="keyword">bin</span>-hadoop2<span class="number">.6</span>/calc_pi.py <span class="keyword">with</span> <span class="keyword">timestamp</span> <span class="number">1463405637243</span></span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">57</span> INFO Utils: /home/yunfeng/Downloads/spark-<span class="number">1.6</span><span class="number">.1</span>-<span class="keyword">bin</span>-hadoop2<span class="number">.6</span>/calc_pi.py has been previously copied <span class="keyword">to</span> /tmp/spark-<span class="number">6</span>cb08b18-<span class="number">143</span></span><br><span class="line"><span class="keyword">f</span>-<span class="number">42</span>dc-<span class="number">88</span>c3-<span class="number">27786460836</span>b/userFiles-ae0a9fc0-<span class="number">65</span>cf-<span class="number">467e-848</span>b-<span class="number">4</span>f3cf4e6e1c2/calc_pi.py</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO PythonRunner: Times: total = <span class="number">340</span>, boot = <span class="number">226</span>, init = <span class="number">1</span>, <span class="keyword">finish</span> = <span class="number">113</span></span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO Executor: Finished task <span class="number">7.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">7</span>). <span class="number">998</span> <span class="keyword">bytes</span> <span class="keyword">result</span> sent <span class="keyword">to</span> driver</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO PythonRunner: Times: total = <span class="number">353</span>, boot = <span class="number">222</span>, init = <span class="number">2</span>, <span class="keyword">finish</span> = <span class="number">129</span></span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO PythonRunner: Times: total = <span class="number">359</span>, boot = <span class="number">230</span>, init = <span class="number">1</span>, <span class="keyword">finish</span> = <span class="number">128</span></span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO PythonRunner: Times: total = <span class="number">360</span>, boot = <span class="number">225</span>, init = <span class="number">3</span>, <span class="keyword">finish</span> = <span class="number">132</span></span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO PythonRunner: Times: total = <span class="number">358</span>, boot = <span class="number">224</span>, init = <span class="number">1</span>, <span class="keyword">finish</span> = <span class="number">133</span></span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO Executor: Finished task <span class="number">5.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">5</span>). <span class="number">998</span> <span class="keyword">bytes</span> <span class="keyword">result</span> sent <span class="keyword">to</span> driver</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO Executor: Finished task <span class="number">4.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">4</span>). <span class="number">998</span> <span class="keyword">bytes</span> <span class="keyword">result</span> sent <span class="keyword">to</span> driver</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO Executor: Finished task <span class="number">0.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">0</span>). <span class="number">998</span> <span class="keyword">bytes</span> <span class="keyword">result</span> sent <span class="keyword">to</span> driver</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO PythonRunner: Times: total = <span class="number">373</span>, boot = <span class="number">248</span>, init = <span class="number">0</span>, <span class="keyword">finish</span> = <span class="number">125</span></span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO Executor: Finished task <span class="number">1.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">1</span>). <span class="number">998</span> <span class="keyword">bytes</span> <span class="keyword">result</span> sent <span class="keyword">to</span> driver</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO Executor: Finished task <span class="number">2.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">2</span>). <span class="number">998</span> <span class="keyword">bytes</span> <span class="keyword">result</span> sent <span class="keyword">to</span> driver</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO TaskSetManager: Finished task <span class="number">7.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">7</span>) <span class="keyword">in</span> <span class="number">420</span> ms <span class="keyword">on</span> localhost (<span class="number">1</span>/<span class="number">8</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO TaskSetManager: Finished task <span class="number">5.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">5</span>) <span class="keyword">in</span> <span class="number">427</span> ms <span class="keyword">on</span> localhost (<span class="number">2</span>/<span class="number">8</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO PythonRunner: Times: total = <span class="number">385</span>, boot = <span class="number">245</span>, init = <span class="number">0</span>, <span class="keyword">finish</span> = <span class="number">140</span></span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO Executor: Finished task <span class="number">6.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">6</span>). <span class="number">998</span> <span class="keyword">bytes</span> <span class="keyword">result</span> sent <span class="keyword">to</span> driver</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO TaskSetManager: Finished task <span class="number">4.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">4</span>) <span class="keyword">in</span> <span class="number">431</span> ms <span class="keyword">on</span> localhost (<span class="number">3</span>/<span class="number">8</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO TaskSetManager: Finished task <span class="number">1.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">1</span>) <span class="keyword">in</span> <span class="number">439</span> ms <span class="keyword">on</span> localhost (<span class="number">4</span>/<span class="number">8</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO TaskSetManager: Finished task <span class="number">2.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">2</span>) <span class="keyword">in</span> <span class="number">437</span> ms <span class="keyword">on</span> localhost (<span class="number">5</span>/<span class="number">8</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO TaskSetManager: Finished task <span class="number">6.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">6</span>) <span class="keyword">in</span> <span class="number">430</span> ms <span class="keyword">on</span> localhost (<span class="number">6</span>/<span class="number">8</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO TaskSetManager: Finished task <span class="number">0.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">0</span>) <span class="keyword">in</span> <span class="number">455</span> ms <span class="keyword">on</span> localhost (<span class="number">7</span>/<span class="number">8</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO PythonRunner: Times: total = <span class="number">390</span>, boot = <span class="number">246</span>, init = <span class="number">1</span>, <span class="keyword">finish</span> = <span class="number">143</span></span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO Executor: Finished task <span class="number">3.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">3</span>). <span class="number">998</span> <span class="keyword">bytes</span> <span class="keyword">result</span> sent <span class="keyword">to</span> driver</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO TaskSetManager: Finished task <span class="number">3.0</span> <span class="keyword">in</span> stage <span class="number">0.0</span> (TID <span class="number">3</span>) <span class="keyword">in</span> <span class="number">442</span> ms <span class="keyword">on</span> localhost (<span class="number">8</span>/<span class="number">8</span>)</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO DAGScheduler: ResultStage <span class="number">0</span> (reduce <span class="keyword">at</span> /home/yunfeng/Downloads/spark-<span class="number">1.6</span><span class="number">.1</span>-<span class="keyword">bin</span>-hadoop2<span class="number">.6</span>/calc_pi.py:<span class="number">12</span>) finished <span class="keyword">in</span> <span class="number">0.467</span></span><br><span class="line"> s</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO TaskSchedulerImpl: Removed TaskSet <span class="number">0.0</span>, whose tasks have all completed, <span class="keyword">from</span> pool </span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO DAGScheduler: Job <span class="number">0</span> finished: reduce <span class="keyword">at</span> /home/yunfeng/Downloads/spark-<span class="number">1.6</span><span class="number">.1</span>-<span class="keyword">bin</span>-hadoop2<span class="number">.6</span>/calc_pi.py:<span class="number">12</span>, took <span class="number">0.569039</span> s</span><br><span class="line">*****<span class="keyword">result</span>:<span class="keyword">pi</span> <span class="keyword">is</span> :<span class="number">3.140324</span>*****</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO SparkContext: Invoking <span class="keyword">stop</span>() <span class="keyword">from</span> <span class="keyword">shutdown</span> hook</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO SparkUI: Stopped Spark web UI <span class="keyword">at</span> <span class="keyword">http</span>://<span class="number">192.168</span><span class="number">.102</span><span class="number">.77</span>:<span class="number">4040</span></span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO MapOutputTrackerMasterEndpoint: MapOutputTrackerMasterEndpoint stopped!</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO MemoryStore: MemoryStore cleared</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO BlockManager: BlockManager stopped</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO BlockManagerMaster: BlockManagerMaster stopped</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO OutputCommitCoordinator$OutputCommitCoordinatorEndpoint: OutputCommitCoordinator stopped!</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO SparkContext: Successfully stopped SparkContext</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO ShutdownHookManager: <span class="keyword">Shutdown</span> hook called</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO ShutdownHookManager: Deleting <span class="keyword">directory</span> /tmp/spark-<span class="number">6</span>cb08b18-<span class="number">143</span><span class="keyword">f</span>-<span class="number">42</span>dc-<span class="number">88</span>c3-<span class="number">27786460836</span>b/pyspark-<span class="number">33</span>d22309-ef12-<span class="number">45</span>d6-<span class="number">9862</span>-<span class="number">2</span></span><br><span class="line"><span class="number">5</span>ceb8beadac</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO ShutdownHookManager: Deleting <span class="keyword">directory</span> /tmp/spark-<span class="number">6</span>cb08b18-<span class="number">143</span><span class="keyword">f</span>-<span class="number">42</span>dc-<span class="number">88</span>c3-<span class="number">27786460836</span>b</span><br><span class="line"><span class="number">16</span>/<span class="number">05</span>/<span class="number">16</span> <span class="number">21</span>:<span class="number">33</span>:<span class="number">58</span> INFO RemoteActorRefProvider$RemotingTerminator: Shutting down remote daemon.</span></span><br></pre></td></tr></table></figure></p>
+<p>可以看到在96行，输出了我们想要的结果：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*****result:pi is :<span class="number">3.140324</span>*****</span><br></pre></td></tr></table></figure></p>
+<p>需要注意的是：Spark自动在本地开了8个进程，来模拟在分布式情况下的计算节点，这样就可以在单机情况下调试适用于分布式情况下的代码了。  </p>
+<h3 id="5-_在分布式环境下部署">5. 在分布式环境下部署</h3><p>在单机上调试好程序后，我们就可以将代码部署到分布式的机器上了。<strong>这里有个要求：每个分布式的机器节点上都必须安装相同版本的Spark。</strong>所以第一步就是再各个机器上安装Spark。  </p>
+<p>安装完Spark后，我们就可以通过下面的命令来启动各个节点的Spark了：<br>1.在要运行Driver程序（master）的机器上，在Spark根目录下，执行命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./sbin/start-master.sh</span><br></pre></td></tr></table></figure></p>
+<p>2.在<strong>各个Worker Node上</strong>，连接到主节点上：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./sbin/star-slave.sh &lt;master-spark-URL&gt;</span><br></pre></td></tr></table></figure></p>
+<p>这是一种手动启动的方式。此外，还可以通过在Driver 程序所在节点上执行下面的命令来自动地启动或停止所有节点的Spark程序：</p>
+<ul>
+<li><code>sbin/start-master.sh</code> ： 启动主进程 </li>
+<li><code>sbin/start-slaves.sh</code> ： 启动<code>conf/slaves</code>文件里面的所有节点</li>
+<li><code>sbin/start-all.sh</code> ： 启动主进程和所有计算节点</li>
+<li><code>sbin/stop-master.sh</code>： 停止主进程</li>
+<li><code>sbin/stop-slavers.sh</code> ： 停止所有计算节点</li>
+</ul>
+<p>配置完分布式环境后，就可以运行程序了。以上述的<code>calc_pi.py</code>为例，假设master程序运行在192.168.3.2:8080，则在运行master的主机上运行如下命令：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./bin/spark-submit -master spark://<span class="number">192.168</span>.<span class="number">3.2</span>:<span class="number">8080</span> calc_pi.py</span><br></pre></td></tr></table></figure></p>
+<p>这样就可以分布式地运行Spark了！</p>
+<p>至此Spark的内容的总结就结束了，总的来说，Spark编程并没有想象中的那么复杂，恰恰相反，随着时间的推移，这些开发工具越来越对开发者友好，这也是使得Spark能轻易地上手的原因。  </p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Python/">Python</a><a href="/tags/Spark/">Spark</a><a href="/tags/并行计算/">并行计算</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://vra.github.io/2016/06/16/spark/" data-title="Spark简介 | Yunfeng&#39;s Hexo Blog" data-tsina="5582731363" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/06/17/openmp-begin/" title="OpenMP并行编程简介">
+  <strong>上一篇：</strong><br/>
+  <span>
+  OpenMP并行编程简介</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2016/04/13/caffe-compile/"  title="caffe compilation troubleshooting">
+ <strong>下一篇：</strong><br/> 
+ <span>caffe compilation troubleshooting
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2016/06/16/spark/" data-title="Spark简介" data-url="http://vra.github.io/2016/06/16/spark/"></div>
+</section>
+
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#核心概念"><span class="toc-number">2.</span> <span class="toc-text">核心概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-_SparkContext"><span class="toc-number">3.</span> <span class="toc-text">1. SparkContext</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_RDD"><span class="toc-number">3.1.</span> <span class="toc-text">2. RDD</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_Action_v-s-_Transformation"><span class="toc-number">3.2.</span> <span class="toc-text">3. Action v.s. Transformation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_Lazy_Evalution"><span class="toc-number">3.3.</span> <span class="toc-text">4. Lazy Evalution</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_Closure"><span class="toc-number">3.4.</span> <span class="toc-text">5. Closure</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-_Shuffle"><span class="toc-number">3.5.</span> <span class="toc-text">6. Shuffle</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-_Persistance"><span class="toc-number">3.6.</span> <span class="toc-text">7. Persistance</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-_Shared_Variables"><span class="toc-number">3.7.</span> <span class="toc-text">8. Shared Variables</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#集群模型"><span class="toc-number">4.</span> <span class="toc-text">集群模型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_Cluster模型"><span class="toc-number">4.1.</span> <span class="toc-text">1. Cluster模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_Cluster_Manager_类型"><span class="toc-number">4.2.</span> <span class="toc-text">2. Cluster Manager 类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_概念辨析"><span class="toc-number">4.3.</span> <span class="toc-text">3. 概念辨析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_资源监控"><span class="toc-number">4.4.</span> <span class="toc-text">4. 资源监控</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#编程体验"><span class="toc-number">5.</span> <span class="toc-text">编程体验</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-_下载Spark程序"><span class="toc-number">5.1.</span> <span class="toc-text">1. 下载Spark程序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-_打开Python命令行"><span class="toc-number">5.2.</span> <span class="toc-text">2. 打开Python命令行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-_读取Spark根目录下REAMDE-md中出现Spark这个单词的行数"><span class="toc-number">5.3.</span> <span class="toc-text">3. 读取Spark根目录下REAMDE.md中出现Spark这个单词的行数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-_用Spark计算Pi（采用随机投点法）"><span class="toc-number">5.4.</span> <span class="toc-text">4. 用Spark计算Pi（采用随机投点法）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-_在分布式环境下部署"><span class="toc-number">5.5.</span> <span class="toc-text">5. 在分布式环境下部署</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/学习总结/C/" title="C++">C++<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/OpenCV/" title="OpenCV">OpenCV<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Sublime-Text/" title="Sublime Text">Sublime Text<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/四季风物/" title="四季风物">四季风物<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/" title="学习总结">学习总结<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/我们的记录/" title="我们的记录">我们的记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/朝花夕拾/" title="朝花夕拾">朝花夕拾<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/未分类/" title="未分类">未分类<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/速记/" title="速记">速记<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Linux/" title="Linux">Linux<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C++">C++<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/学习总结/" title="学习总结">学习总结<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/并行计算/" title="并行计算">并行计算<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python/" title="Python">Python<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Caffe/" title="Caffe">Caffe<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Sublime-Text/" title="Sublime Text">Sublime Text<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/GPU/" title="GPU">GPU<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/总结/" title="总结">总结<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web编程/" title="Web编程">Web编程<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CUDA/" title="CUDA">CUDA<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Nvidia/" title="Nvidia">Nvidia<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Shell/" title="Shell">Shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/博客备忘/" title="博客备忘">博客备忘<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/matlab/" title="matlab">matlab<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/asciinema/" title="asciinema">asciinema<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Make/" title="Make">Make<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/机器学习-总结/" title="机器学习 总结">机器学习 总结<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/Apache/" style="font-size: 10px;">Apache</a> <a href="/tags/C/" style="font-size: 20px;">C++</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CUDA/" style="font-size: 12px;">CUDA</a> <a href="/tags/Caffe/" style="font-size: 14px;">Caffe</a> <a href="/tags/Deep-Learning/" style="font-size: 10px;">Deep Learning</a> <a href="/tags/DeepLearning/" style="font-size: 10px;">DeepLearning</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/GPU/" style="font-size: 14px;">GPU</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Make/" style="font-size: 10px;">Make</a> <a href="/tags/Nvidia/" style="font-size: 10px;">Nvidia</a> <a href="/tags/OpenMP/" style="font-size: 10px;">OpenMP</a> <a href="/tags/PIL/" style="font-size: 10px;">PIL</a> <a href="/tags/Python/" style="font-size: 14px;">Python</a> <a href="/tags/Shell/" style="font-size: 10px;">Shell</a> <a href="/tags/Siamese-Network/" style="font-size: 10px;">Siamese Network</a> <a href="/tags/Spark/" style="font-size: 10px;">Spark</a> <a href="/tags/Sublime-Text/" style="font-size: 14px;">Sublime Text</a> <a href="/tags/Web编程/" style="font-size: 12px;">Web编程</a> <a href="/tags/Wordpress/" style="font-size: 10px;">Wordpress</a> <a href="/tags/asciinema/" style="font-size: 10px;">asciinema</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/matlab/" style="font-size: 10px;">matlab</a> <a href="/tags/博客备忘/" style="font-size: 10px;">博客备忘</a> <a href="/tags/图像处理/" style="font-size: 10px;">图像处理</a> <a href="/tags/学习总结/" style="font-size: 18px;">学习总结</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/并行计算/" style="font-size: 16px;">并行计算</a> <a href="/tags/总结/" style="font-size: 12px;">总结</a> <a href="/tags/机器学习-总结/" style="font-size: 10px;">机器学习 总结</a> <a href="/tags/深度学习/" style="font-size: 10px;">深度学习</a> <a href="/tags/计算机视觉/" style="font-size: 12px;">计算机视觉</a> <a href="/tags/速记/" style="font-size: 10px;">速记</a>
+    </div>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://cra.blog.ustc.edu.cn" target="_blank" title="他年得傍蟾宫客">他年得傍蟾宫客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=5582731363&verifier=db8de729&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Yunfeng Wang in USTC <br/>
+			This is my blog, keep thinking, keep working</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/5582731363" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/vra" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		<a href="http://stackoverflow.com/users/2932001" target="_blank" class="icon-stack-overflow" title="stackoverflow"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Yunfeng Wang">Yunfeng Wang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"vra"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'yunfengshexoblog';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255298630'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255298630' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  <!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</body>
+</html>

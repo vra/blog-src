@@ -1,0 +1,713 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>C++学习总结4——类型转换 | Yunfeng&#39;s Hexo Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Yunfeng Wang">
+    
+
+    
+    <meta name="description" content="在写程序的时候有时会遇到类型转换的问题，而这些问题的解答每次都记不住，每次都得上网查找，经常下来，也觉得很浪费时间。所以这里我把C语言和C++里面一些常用的类型转换方式写下来，一方面为了以后查找方便，另一方面也是希望通过敲一遍能尽可能地记住转换的思路。所有这些转换的代码我已经放到了github上，或许可以帮到你。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++学习总结4——类型转换">
+<meta property="og:url" content="http://vra.github.io/2015/03/31/cpp-type-cast/index.html">
+<meta property="og:site_name" content="Yunfeng's Hexo Blog">
+<meta property="og:description" content="在写程序的时候有时会遇到类型转换的问题，而这些问题的解答每次都记不住，每次都得上网查找，经常下来，也觉得很浪费时间。所以这里我把C语言和C++里面一些常用的类型转换方式写下来，一方面为了以后查找方便，另一方面也是希望通过敲一遍能尽可能地记住转换的思路。所有这些转换的代码我已经放到了github上，或许可以帮到你。">
+<meta property="og:updated_time" content="2017-01-08T09:23:44.734Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C++学习总结4——类型转换">
+<meta name="twitter:description" content="在写程序的时候有时会遇到类型转换的问题，而这些问题的解答每次都记不住，每次都得上网查找，经常下来，也觉得很浪费时间。所以这里我把C语言和C++里面一些常用的类型转换方式写下来，一方面为了以后查找方便，另一方面也是希望通过敲一遍能尽可能地记住转换的思路。所有这些转换的代码我已经放到了github上，或许可以帮到你。">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Yunfeng&#39;s Hexo Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/author.jpg">
+    
+    
+    <link rel="apple-touch-icon" href="/img/logo.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Yunfeng&#39;s Hexo Blog" title="Yunfeng&#39;s Hexo Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Yunfeng&#39;s Hexo Blog">Yunfeng&#39;s Hexo Blog</a></h1>
+				<h2 class="blog-motto">Life is the process of learning</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					<li>
+						<a href="/atom.xml">RSS</a>
+					</li>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/03/31/cpp-type-cast/" title="C++学习总结4——类型转换" itemprop="url">C++学习总结4——类型转换</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Yunfeng Wang" target="_blank" itemprop="author">Yunfeng Wang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-03-31T11:52:17.000Z" itemprop="datePublished"> 发表于 2015-03-31</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#几种字符串之间的转换"><span class="toc-number">1.</span> <span class="toc-text">几种字符串之间的转换</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#字符串类型介绍"><span class="toc-number">1.1.</span> <span class="toc-text">字符串类型介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#转换代码"><span class="toc-number">1.2.</span> <span class="toc-text">转换代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#字符数组和字符串之间的转换"><span class="toc-number">2.</span> <span class="toc-text">字符数组和字符串之间的转换</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#const_char*_和char*之间转换（const_wchar_t*_与_wchar_t*_类似）"><span class="toc-number">2.1.</span> <span class="toc-text">const char* 和char*之间转换（const wchar_t* 与 wchar_t* 类似）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#char*和wchar_t*之间的转换"><span class="toc-number">2.2.</span> <span class="toc-text">char*和wchar_t*之间的转换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#char*_和_string的转换（wchar_t*_和_wstring转换同理）"><span class="toc-number">2.3.</span> <span class="toc-text">char* 和 string的转换（wchar_t* 和 wstring转换同理）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#wchar_t*和string，char*_和wstring之间的转换"><span class="toc-number">2.4.</span> <span class="toc-text">wchar_t*和string，char* 和wstring之间的转换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#字符串和别的数据类型之间的转换"><span class="toc-number">3.</span> <span class="toc-text">字符串和别的数据类型之间的转换</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#char*_和int，float类型转换"><span class="toc-number">3.1.</span> <span class="toc-text">char* 和int，float类型转换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#string_和int，float类型之间的转换"><span class="toc-number">3.2.</span> <span class="toc-text">string 和int，float类型之间的转换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考内容"><span class="toc-number">4.</span> <span class="toc-text">参考内容</span></a></li></ol>
+		
+		</div>
+		
+		<p>在写程序的时候有时会遇到类型转换的问题，而这些问题的解答每次都记不住，每次都得上网查找，经常下来，也觉得很浪费时间。所以这里我把C语言和C++里面一些常用的类型转换方式写下来，一方面为了以后查找方便，另一方面也是希望通过敲一遍能尽可能地记住转换的思路。所有这些转换的代码我已经放到了<a href="https://github.com/vra/cast-utilities" target="_blank" rel="external">github</a>上，或许可以帮到你。<br><a id="more"></a></p>
+<h2 id="几种字符串之间的转换">几种字符串之间的转换</h2><h3 id="字符串类型介绍">字符串类型介绍</h3><p>这里说的“字符串”包括<code>string</code>，’wstring’，’CString’。<code>string</code>是C++里面默认的字符串表示形式,<code>string</code>的实现使用了容器的概念，所以<code>string</code>类对象也有<code>begin()</code>，<code>end()</code>这些迭代方法。’wstring’ 是保存宽字符（wide character，C++中有wchar_t类型来表示宽字符）的字符串。字符串常量在初始化’wstring’类型对象时，前面要加“L”，用以表明是宽字符串。’CString’是Windows平台下的特定的字符串，在MFC程序中使用广泛，但也可以在非MFC程序中使用，只要包括相应的头文件即可:’CString’在afx.h中定义，所以只需在程序中include <afx.h>就可以使用’CString’啦。</afx.h></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span><span class="string">&lt;string&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> _AFXDLL _AFXDLL_H_ <span class="comment">//注意：必须写在afx.h之前</span></span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;afx.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="built_in">string</span> str_exampe = “This is oridnary <span class="built_in">string</span>”;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//注意：字符串常量前面要加L</span></span><br><span class="line">    wstring wstr_exampe = L”This is wide <span class="built_in">string</span>”;</span><br><span class="line"></span><br><span class="line">    CString cstr_example = “This is Cstring”;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>要强调的是，_AFXDLL的定义必须写在#include<afx.h>之前，否则会出现_AFXDLL未定义的错误。</afx.h></p>
+<h3 id="转换代码">转换代码</h3><p>CString 可以用来表示所有字符，根据字符编码的不同，可以表示宽字符或者非宽字符。Windows使用了LPCTSTR来表示你的字符是否使用了UNICODE, 如果你的程序定义了UNICODE或者其他相关的宏，那么这个字符或者字符串将被作为UNICODE字符串，否则就是标准的ANSI字符串。贴代码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line">#include&lt;string&gt;</span><br><span class="line"></span><br><span class="line">#define _AFXDLL XXX //注意：必须写在afx.h之前</span><br><span class="line"></span><br><span class="line">#include &lt;afx.h&gt;</span><br><span class="line"></span><br><span class="line">using namespace std;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    //1-1.string to wstring</span><br><span class="line">    string name = “Aldex”;</span><br><span class="line">    wstring w_name(name.begin(), name.end());</span><br><span class="line"></span><br><span class="line">    //1-2\. wstring to string</span><br><span class="line">    wstring w_name2 =L”Smitch Hill”;</span><br><span class="line">    string name2(w_name2.begin(), w_name2.end());</span><br><span class="line">    cout &lt;&lt; name2 &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    //2-1.string to CString</span><br><span class="line">    string name3 = “Cook Book”;</span><br><span class="line">    CString c_name3(name3.c_str());</span><br><span class="line">    cout &lt;&lt; c_name3 &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    //2-2.CString to string</span><br><span class="line">    CString c_name4 = “Malon Balendo”;</span><br><span class="line">    string name4 = (LPCTSTR)c_name4;</span><br><span class="line">    cout &lt;&lt; name4 &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    //3-1.wstring to CString</span><br><span class="line">    wstring w_name5 = L”Odlely Herben”;</span><br><span class="line">    CString c_name5 = w_name5.c_str();</span><br><span class="line">    cout &lt;&lt; c_name5 &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    //3-2.Cstring to wstring</span><br><span class="line">    CString c_name6 = “Jephp Phoo”;</span><br><span class="line"></span><br><span class="line">    //in ANSI build</span><br><span class="line">    wstring w_name6 =CStringW(c_name6);</span><br><span class="line">    //in Unicode build</span><br><span class="line">    wstring w_name6 = c_name6;</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>需要强调的是，从CString转换到wstring时，需要根据当前项目的编码方式来决定该用哪种转换方法（我在VS里面试了一下，默认是ANSI 环境）。</p>
+<h2 id="字符数组和字符串之间的转换">字符数组和字符串之间的转换</h2><h3 id="const_char*_和char*之间转换（const_wchar_t*_与_wchar_t*_类似）">const char* 和char*之间转换（const wchar_t* 与 wchar_t* 类似）</h3><p>由于指针和数组相似的性质，下面统一用指针来陈述。</p>
+<p><code>const char*</code> 是常字符数组，相比<code>char*</code>，其内容是不可变的，所以从<code>char*</code> 到<code>const char*</code>是“从宽到窄”，正常可以进行，甚至不需要类型转换；而从<code>const char*</code> 到<code>char*</code>则是“从窄到宽”，转换被认为是不正常的，所以如果需要这样的转换，请先考虑程序设计是否有问题。当然，转换方式还是有的：可以用<code>strdup</code> 或者<code>_strdup</code>函数。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span><span class="string">&lt;string&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span><br><span class="line"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//1-1.char* to const char*</span></span><br><span class="line">    <span class="keyword">char</span>* arr_name =“Hello, Blub Bulb “;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span>* c_arr_name = arr_name;</span><br><span class="line">    <span class="built_in">printf</span>(“%s”, c_arr_name);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//1-2.const char* to char</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span>* c_arr_name2 = “Android Lollipop”;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* arr_name2 = _strdup(c_arr_name2); <span class="comment">//ISO C++ onformant name</span></span><br><span class="line">    <span class="keyword">char</span>* arr_name2 = strdup(c_arr_name2); <span class="comment">//The Posix name</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(“%s”, arr_name2);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="char*和wchar_t*之间的转换">char*和wchar_t*之间的转换</h3><p><code>char*</code>和<code>wchar_t*</code>之间的转换我很少用到，这里还是从网上找了出来，列举如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span><br><span class="line"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//2-1.char* to wchar_t*</span></span><br><span class="line">    <span class="keyword">char</span>* arr_name = “Hulu Gulu”;</span><br><span class="line">    <span class="keyword">size_t</span> size = <span class="built_in">strlen</span>(arr_name) + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">wchar_t</span>* w_arr_name = <span class="keyword">new</span> <span class="keyword">wchar_t</span>[size];</span><br><span class="line">    mbstowcs(w_arr_name, arr_name, size);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//2-2\. wchar_t* to char*</span></span><br><span class="line">    <span class="keyword">wchar_t</span>* w_arr_name2 = L”Big Ben”;</span><br><span class="line">    <span class="keyword">char</span>* arr_name2 = <span class="keyword">new</span> <span class="keyword">char</span>[wcslen(w_arr_name2)]; <span class="comment">// wcslen用来求宽体字符数组的长度</span></span><br><span class="line">    wcstombs(arr_name2, w_arr_name2, wcslen(w_arr_name2));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="char*_和_string的转换（wchar_t*_和_wstring转换同理）">char* 和 string的转换（wchar_t* 和 wstring转换同理）</h3><p><code>char*</code> 转化为<code>string</code>时会进行默认类型转换，即不需要显式地转换。而<code>string</code>转换为<code>const char*</code> 比较容易，要转换为<code>char*</code>比较麻烦，要进行内存的复制，如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span><span class="string">&lt;string&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span><br><span class="line"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//3-1.char* to string</span></span><br><span class="line">    <span class="keyword">char</span>* arr_name = “This is my name”;</span><br><span class="line">    <span class="function"><span class="built_in">string</span> <span class="title">name</span><span class="params">(arr_name)</span></span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; arr_name;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//3-2.string to char*</span></span><br><span class="line">    <span class="built_in">string</span> name2 = “Hoop Hope”;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//转换为const char* 类型</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span>* c_arr_name2 = name2.c_str();   </span><br><span class="line"></span><br><span class="line">    <span class="comment">//转换为char*类型</span></span><br><span class="line">    <span class="keyword">char</span>* arr_name2 = <span class="keyword">new</span> <span class="keyword">char</span>[name2.length() + <span class="number">1</span>];</span><br><span class="line">    <span class="built_in">strcpy</span>(arr_name2, name2.c_str());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="wchar_t*和string，char*_和wstring之间的转换">wchar_t*和string，char* 和wstring之间的转换</h3><p>这一类的转换我没遇到过，但我想利用前面的这些转换方法，通过使用一个中间格式，可以完成转换，所以就再没有查这部分的转换。</p>
+<h2 id="字符串和别的数据类型之间的转换">字符串和别的数据类型之间的转换</h2><p>这部分总结下字符串类型和int，float这些类型转换时的一些方法。</p>
+<h3 id="char*_和int，float类型转换">char* 和int，float类型转换</h3><p>这方面有三种选择：<code>atoi</code>（对float类型是<code>atof</code>）， <code>sscanf</code>和<code>strtol</code>（对float类型，是<code>strtof</code>）。<a href="http://stackoverflow.com/questions/3420629/convert-string-to-integer-sscanf-or-atoi" target="_blank" rel="external">StackOverFlow上的这个回答</a>详细的解释了三者的区别，总体来说<code>atoi</code>速度最快，但出错时没有提示，<code>sscanf</code>可以通过类似<code>scanf</code>的方式来读取，<code>strtol</code>最安全，错误提示也多，但默认是将<code>char*</code> 转换为<code>long int</code>(函数名的含义：<code>str to long</code>)。三种代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span><span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span><br><span class="line"></span>&#123;</span><br><span class="line">     <span class="comment">//1-1.char* to int</span></span><br><span class="line">     <span class="keyword">char</span>* arr_number = “<span class="number">2015</span>”;</span><br><span class="line"></span><br><span class="line">     <span class="comment">//a.use atoi</span></span><br><span class="line">     <span class="keyword">int</span> number1 = atoi(arr_number);</span><br><span class="line">     <span class="built_in">cout</span> &lt;&lt; number1&lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">     <span class="comment">//b.use sscanf</span></span><br><span class="line">     <span class="keyword">int</span> number2;</span><br><span class="line">     <span class="built_in">sscanf</span>(arr_number, “%d”, &amp;number2);</span><br><span class="line">     <span class="built_in">cout</span> &lt;&lt; number2 &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">     <span class="comment">//c.use strtol</span></span><br><span class="line">     <span class="keyword">char</span>* pEnd; <span class="comment">//用以指向末尾位置</span></span><br><span class="line"></span><br><span class="line">     <span class="keyword">int</span> number3 = strtol(arr_number, &amp;pEnd, <span class="number">0</span>);<span class="comment">//最后一个参数表示从char*的第几个位置开始读取</span></span><br><span class="line"></span><br><span class="line">     <span class="comment">//1-2.int to char*</span></span><br><span class="line"></span><br><span class="line">     <span class="keyword">int</span> time = <span class="number">2345</span>;</span><br><span class="line"></span><br><span class="line">     <span class="comment">//a.use itoa</span></span><br><span class="line">     <span class="keyword">char</span>* arr_time;</span><br><span class="line">     itoa(time, arr_time, <span class="number">0</span>);<span class="comment">//最后一个参数表示从int的第几个位置开始读取</span></span><br><span class="line"></span><br><span class="line">     <span class="comment">//b.use sprintf</span></span><br><span class="line">     <span class="keyword">char</span>* arr_time2;</span><br><span class="line">     <span class="built_in">sprintf</span>(arr_time2, “%d”, time);</span><br><span class="line"></span><br><span class="line">     <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="string_和int，float类型之间的转换">string 和int，float类型之间的转换</h3><p><code>string</code>和<code>int</code>，<code>float</code>之间的转换要用到 <code>stringstream</code>，或者<code>ostringstream</code>和<code>istringstream</code>。  </p>
+<p>区别是<code>stringstream</code>既可以传入，也可以传出，所以既可以将<code>string</code>转化为<code>int</code>或<code>float</code>，也可以将<code>int</code>或<code>float</code>转换为<code>string</code>；而<code>ostringstream</code>只能输出<code>string</code>，所以只能将<code>int</code>或<code>float</code>转换为<code>string</code>，<code>istringstream</code>刚好反过来了。  </p>
+<p>总的来说<code>stringstream</code>是双向的，而<code>i/ostringstream</code>是单向的。相应地，<code>wstring</code>和<code>int</code>/<code>float</code> 可以通过<code>wstring</code>或者<code>wostringstream</code>和<code>wistringstream</code>来转换。 </p>
+<p>注意需要包含<code>sstream</code>头文件。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span><span class="string">&lt;sstream&gt;</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span><span class="string">&lt;string&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span><br><span class="line"></span>&#123;</span><br><span class="line"></span><br><span class="line">     <span class="comment">//2-1.string to int</span></span><br><span class="line">     <span class="built_in">string</span> str_age = “<span class="number">73</span>”;</span><br><span class="line"></span><br><span class="line">     <span class="comment">//a.use stringstream</span></span><br><span class="line">     <span class="function"><span class="built_in">stringstream</span> <span class="title">s</span><span class="params">(str_age)</span></span>;</span><br><span class="line">     <span class="keyword">int</span> age;</span><br><span class="line">     s &gt;&gt; age;</span><br><span class="line">     <span class="built_in">cout</span> &lt;&lt; age &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">     <span class="comment">//b.use istringstream</span></span><br><span class="line">     <span class="function"><span class="built_in">istringstream</span> <span class="title">is</span><span class="params">(str_age)</span></span>;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">int</span> age2;</span><br><span class="line">     is &gt;&gt; age2;</span><br><span class="line">     <span class="built_in">cout</span> &lt;&lt; age2 &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">     <span class="comment">//2-2.int to string</span></span><br><span class="line"></span><br><span class="line">     <span class="comment">//a.use stringstream</span></span><br><span class="line">     <span class="keyword">int</span> year = <span class="number">2015</span>;</span><br><span class="line">     <span class="built_in">stringstream</span> s2;</span><br><span class="line">     s2 &lt;&lt; year;</span><br><span class="line">     <span class="built_in">string</span> str_year;</span><br><span class="line">     s2 &gt;&gt; str_year;</span><br><span class="line">     <span class="built_in">cout</span> &lt;&lt; str_year &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">     <span class="comment">//b.use ostringstream</span></span><br><span class="line">     <span class="built_in">ostringstream</span> os;</span><br><span class="line">     os &lt;&lt; year;</span><br><span class="line">     <span class="built_in">string</span> str_year2 = os.str();</span><br><span class="line">     <span class="built_in">cout</span> &lt;&lt; str_year2 &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考内容">参考内容</h2><p>基本都是StackOverFlow的链接……</p>
+<p>1.<a href="http://stackoverflow.com/questions/2573834/c-convert-string-or-char-to-wstring-or-wchar-t" target="_blank" rel="external">http://stackoverflow.com/questions/2573834/c-convert-string-or-char-to-wstring-or-wchar-t</a></p>
+<p>2.<a href="http://stackoverflow.com/questions/4804298/how-to-convert-wstring-into-string" target="_blank" rel="external">http://stackoverflow.com/questions/4804298/how-to-convert-wstring-into-string</a></p>
+<p>3.<a href="http://stackoverflow.com/questions/15333259/c-stdwstring-to-stdstring-quick-and-dirty-conversion-for-use-as-key-in" target="_blank" rel="external">http://stackoverflow.com/questions/15333259/c-stdwstring-to-stdstring-quick-and-dirty-conversion-for-use-as-key-in</a></p>
+<p>4.<a href="http://stackoverflow.com/questions/11821491/converting-string-to-cstring-in-c" target="_blank" rel="external">http://stackoverflow.com/questions/11821491/converting-string-to-cstring-in-c</a></p>
+<p>5.<a href="http://stackoverflow.com/questions/2041241/convert-cstring-to-stdwstring" target="_blank" rel="external">http://stackoverflow.com/questions/2041241/convert-cstring-to-stdwstring</a></p>
+<p>6.<a href="http://stackoverflow.com/questions/258050/how-to-convert-cstring-and-stdstring-stdwstring-to-each-other" target="_blank" rel="external">http://stackoverflow.com/questions/258050/how-to-convert-cstring-and-stdstring-stdwstring-to-each-other</a></p>
+<p>7.<a href="http://stackoverflow.com/questions/6117270/mfc-stdstring-vs-cstring" target="_blank" rel="external">http://stackoverflow.com/questions/6117270/mfc-stdstring-vs-cstring</a></p>
+<p>8.<a href="http://stackoverflow.com/questions/2041241/convert-cstring-to-stdwstring" target="_blank" rel="external">http://stackoverflow.com/questions/2041241/convert-cstring-to-stdwstring</a></p>
+<p>9.<a href="http://stackoverflow.com/questions/2259544/is-wchar-t-needed-for-unicode-support" target="_blank" rel="external">http://stackoverflow.com/questions/2259544/is-wchar-t-needed-for-unicode-support</a></p>
+<p>10.<a href="http://baike.baidu.com/view/998109.htm" target="_blank" rel="external">http://baike.baidu.com/view/998109.htm</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/学习总结/">学习总结</a>►<a class="article-category-link" href="/categories/学习总结/C/">C++</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/C/">C++</a><a href="/tags/学习总结/">学习总结</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://vra.github.io/2015/03/31/cpp-type-cast/" data-title="C++学习总结4——类型转换 | Yunfeng&#39;s Hexo Blog" data-tsina="5582731363" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/22/opencv-vs-config/" title="OpenCV配置——在Visual Studio中使用OpenCV">
+  <strong>上一篇：</strong><br/>
+  <span>
+  OpenCV配置——在Visual Studio中使用OpenCV</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/03/21/leisun-phd-note/"  title="听孙雷博士论文答辩记录">
+ <strong>下一篇：</strong><br/> 
+ <span>听孙雷博士论文答辩记录
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2015/03/31/cpp-type-cast/" data-title="C++学习总结4——类型转换" data-url="http://vra.github.io/2015/03/31/cpp-type-cast/"></div>
+</section>
+
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#几种字符串之间的转换"><span class="toc-number">1.</span> <span class="toc-text">几种字符串之间的转换</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#字符串类型介绍"><span class="toc-number">1.1.</span> <span class="toc-text">字符串类型介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#转换代码"><span class="toc-number">1.2.</span> <span class="toc-text">转换代码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#字符数组和字符串之间的转换"><span class="toc-number">2.</span> <span class="toc-text">字符数组和字符串之间的转换</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#const_char*_和char*之间转换（const_wchar_t*_与_wchar_t*_类似）"><span class="toc-number">2.1.</span> <span class="toc-text">const char* 和char*之间转换（const wchar_t* 与 wchar_t* 类似）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#char*和wchar_t*之间的转换"><span class="toc-number">2.2.</span> <span class="toc-text">char*和wchar_t*之间的转换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#char*_和_string的转换（wchar_t*_和_wstring转换同理）"><span class="toc-number">2.3.</span> <span class="toc-text">char* 和 string的转换（wchar_t* 和 wstring转换同理）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#wchar_t*和string，char*_和wstring之间的转换"><span class="toc-number">2.4.</span> <span class="toc-text">wchar_t*和string，char* 和wstring之间的转换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#字符串和别的数据类型之间的转换"><span class="toc-number">3.</span> <span class="toc-text">字符串和别的数据类型之间的转换</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#char*_和int，float类型转换"><span class="toc-number">3.1.</span> <span class="toc-text">char* 和int，float类型转换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#string_和int，float类型之间的转换"><span class="toc-number">3.2.</span> <span class="toc-text">string 和int，float类型之间的转换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考内容"><span class="toc-number">4.</span> <span class="toc-text">参考内容</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/学习总结/C/" title="C++">C++<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/OpenCV/" title="OpenCV">OpenCV<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Sublime-Text/" title="Sublime Text">Sublime Text<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/四季风物/" title="四季风物">四季风物<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/" title="学习总结">学习总结<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/我们的记录/" title="我们的记录">我们的记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/朝花夕拾/" title="朝花夕拾">朝花夕拾<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/未分类/" title="未分类">未分类<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/速记/" title="速记">速记<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Linux/" title="Linux">Linux<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C++">C++<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/学习总结/" title="学习总结">学习总结<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/并行计算/" title="并行计算">并行计算<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python/" title="Python">Python<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Caffe/" title="Caffe">Caffe<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Sublime-Text/" title="Sublime Text">Sublime Text<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/GPU/" title="GPU">GPU<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/总结/" title="总结">总结<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web编程/" title="Web编程">Web编程<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CUDA/" title="CUDA">CUDA<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Nvidia/" title="Nvidia">Nvidia<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Shell/" title="Shell">Shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/博客备忘/" title="博客备忘">博客备忘<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/matlab/" title="matlab">matlab<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/asciinema/" title="asciinema">asciinema<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Make/" title="Make">Make<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/机器学习-总结/" title="机器学习 总结">机器学习 总结<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/Apache/" style="font-size: 10px;">Apache</a> <a href="/tags/C/" style="font-size: 20px;">C++</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CUDA/" style="font-size: 12px;">CUDA</a> <a href="/tags/Caffe/" style="font-size: 14px;">Caffe</a> <a href="/tags/Deep-Learning/" style="font-size: 10px;">Deep Learning</a> <a href="/tags/DeepLearning/" style="font-size: 10px;">DeepLearning</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/GPU/" style="font-size: 14px;">GPU</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Make/" style="font-size: 10px;">Make</a> <a href="/tags/Nvidia/" style="font-size: 10px;">Nvidia</a> <a href="/tags/OpenMP/" style="font-size: 10px;">OpenMP</a> <a href="/tags/PIL/" style="font-size: 10px;">PIL</a> <a href="/tags/Python/" style="font-size: 14px;">Python</a> <a href="/tags/Shell/" style="font-size: 10px;">Shell</a> <a href="/tags/Siamese-Network/" style="font-size: 10px;">Siamese Network</a> <a href="/tags/Spark/" style="font-size: 10px;">Spark</a> <a href="/tags/Sublime-Text/" style="font-size: 14px;">Sublime Text</a> <a href="/tags/Web编程/" style="font-size: 12px;">Web编程</a> <a href="/tags/Wordpress/" style="font-size: 10px;">Wordpress</a> <a href="/tags/asciinema/" style="font-size: 10px;">asciinema</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/matlab/" style="font-size: 10px;">matlab</a> <a href="/tags/博客备忘/" style="font-size: 10px;">博客备忘</a> <a href="/tags/图像处理/" style="font-size: 10px;">图像处理</a> <a href="/tags/学习总结/" style="font-size: 18px;">学习总结</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/并行计算/" style="font-size: 16px;">并行计算</a> <a href="/tags/总结/" style="font-size: 12px;">总结</a> <a href="/tags/机器学习-总结/" style="font-size: 10px;">机器学习 总结</a> <a href="/tags/深度学习/" style="font-size: 10px;">深度学习</a> <a href="/tags/计算机视觉/" style="font-size: 12px;">计算机视觉</a> <a href="/tags/速记/" style="font-size: 10px;">速记</a>
+    </div>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://cra.blog.ustc.edu.cn" target="_blank" title="他年得傍蟾宫客">他年得傍蟾宫客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=5582731363&verifier=db8de729&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Yunfeng Wang in USTC <br/>
+			This is my blog, keep thinking, keep working</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/5582731363" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/vra" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		<a href="http://stackoverflow.com/users/2932001" target="_blank" class="icon-stack-overflow" title="stackoverflow"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Yunfeng Wang">Yunfeng Wang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"vra"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'yunfengshexoblog';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255298630'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255298630' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  <!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</body>
+</html>

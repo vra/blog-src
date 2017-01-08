@@ -1,0 +1,719 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>GPU并行计算和CUDA编程(1)-CPU体系架构概述 | Yunfeng&#39;s Hexo Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Yunfeng Wang">
+    
+
+    
+    <meta name="description" content="今天和实验室同学去听了周斌老师讲的《GPU并行计算和CUDA程序开发及优化》（课程主页：http://acsa.ustc.edu.cn/HPC2015/nvidia/），觉得老师讲得非常清晰，举了很多恰当的例子，将复杂的计算机中的情景和术语准确地描述成了简单的生活中的场景，使学生很容易就理解了。而我在今天的课程中也学到了很多东西，我想趁热打铁记下来，以后看起来更方便点。 
+CPU是串行处理器，而G">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GPU并行计算和CUDA编程(1)-CPU体系架构概述">
+<meta property="og:url" content="http://vra.github.io/2015/09/12/gpu-programming-1/index.html">
+<meta property="og:site_name" content="Yunfeng's Hexo Blog">
+<meta property="og:description" content="今天和实验室同学去听了周斌老师讲的《GPU并行计算和CUDA程序开发及优化》（课程主页：http://acsa.ustc.edu.cn/HPC2015/nvidia/），觉得老师讲得非常清晰，举了很多恰当的例子，将复杂的计算机中的情景和术语准确地描述成了简单的生活中的场景，使学生很容易就理解了。而我在今天的课程中也学到了很多东西，我想趁热打铁记下来，以后看起来更方便点。 
+CPU是串行处理器，而G">
+<meta property="og:updated_time" content="2017-01-08T09:23:44.754Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GPU并行计算和CUDA编程(1)-CPU体系架构概述">
+<meta name="twitter:description" content="今天和实验室同学去听了周斌老师讲的《GPU并行计算和CUDA程序开发及优化》（课程主页：http://acsa.ustc.edu.cn/HPC2015/nvidia/），觉得老师讲得非常清晰，举了很多恰当的例子，将复杂的计算机中的情景和术语准确地描述成了简单的生活中的场景，使学生很容易就理解了。而我在今天的课程中也学到了很多东西，我想趁热打铁记下来，以后看起来更方便点。 
+CPU是串行处理器，而G">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Yunfeng&#39;s Hexo Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/author.jpg">
+    
+    
+    <link rel="apple-touch-icon" href="/img/logo.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Yunfeng&#39;s Hexo Blog" title="Yunfeng&#39;s Hexo Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Yunfeng&#39;s Hexo Blog">Yunfeng&#39;s Hexo Blog</a></h1>
+				<h2 class="blog-motto">Life is the process of learning</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					<li>
+						<a href="/atom.xml">RSS</a>
+					</li>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/09/12/gpu-programming-1/" title="GPU并行计算和CUDA编程(1)-CPU体系架构概述" itemprop="url">GPU并行计算和CUDA编程(1)-CPU体系架构概述</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Yunfeng Wang" target="_blank" itemprop="author">Yunfeng Wang</a>
+		
+  <p class="article-time">
+    <time datetime="2015-09-12T13:09:10.000Z" itemprop="datePublished"> 发表于 2015-09-12</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一些概念"><span class="toc-number">1.</span> <span class="toc-text">一些概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#流水线存在的一些问题"><span class="toc-number">2.</span> <span class="toc-text">流水线存在的一些问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#指令调度"><span class="toc-number">3.</span> <span class="toc-text">指令调度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#缓存机制"><span class="toc-number">4.</span> <span class="toc-text">缓存机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CPU内部的并行性"><span class="toc-number">5.</span> <span class="toc-text">CPU内部的并行性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多核相关"><span class="toc-number">6.</span> <span class="toc-text">多核相关</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他"><span class="toc-number">7.</span> <span class="toc-text">其他</span></a></li></ol>
+		
+		</div>
+		
+		<p>今天和实验室同学去听了周斌老师讲的《GPU并行计算和CUDA程序开发及优化》（课程主页：<a href="http://acsa.ustc.edu.cn/HPC2015/nvidia/" target="_blank" rel="external">http://acsa.ustc.edu.cn/HPC2015/nvidia/</a>），觉得老师讲得非常清晰，举了很多恰当的例子，将复杂的计算机中的情景和术语准确地描述成了简单的生活中的场景，使学生很容易就理解了。而我在今天的课程中也学到了很多东西，我想趁热打铁记下来，以后看起来更方便点。 </p>
+<p>CPU是串行处理器，而GPU是并行处理器。CPU适合处理通用型的问题，如指令执行和数值计算并重，相当于是一个”通才”；而GPU适合运算密集和高度并行的任务，相当于是一个”专才”，将数值并行运算速度发挥到极致。在讨论GPU之前，先来看看CPU的体系架构的一些内容。 </p>
+<a id="more"></a>
+<h2 id="一些概念">一些概念</h2><p>CPU的指令分3类，分别是算术、访存和控制。算术包括加减乘除等操作（在计算机中转化为加或乘来做），访存表示对数据寄存器进行读写，控制表示跳转，分支等操作。  </p>
+<p>CPU程序的最优化目标是：</p>
+<p><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script><br>$$\frac{cycle}{instruction}\times\frac{seconds}{cycle}$$<br>其中前一项是每条指令执行的时钟周期数，简称为CPI（Cycle Per Instruction)，后一项即时钟周期。 </p>
+<p>CPU的指令顺序是取指-&gt;译码-&gt;执行-&gt;访存-&gt;写回。  </p>
+<p>为了提高程序执行的效率，CPU里面采用了流水线的设计，将一个任务分割成多个任务片段，在同一时刻，每个任务片段可能处理不同的指令。注意：我们说CPU是串行处理器，是从宏观的角度来说的，底层的流水线实现实际是并行的。此外，流水线使得单个指令的执行周期变长了，因为增加了任务时间段的切割，可能会增加额外的时间开销，但从整体上来讲，效率显然是提高了。 </p>
+<h2 id="流水线存在的一些问题">流水线存在的一些问题</h2><p>流水线中，可能会出现停滞（stall）的问题，就是对某个任务片段，前面的指令已经执行完了，而后面的指令还没有传过来，出现了停滞。 </p>
+<p>另外一个问题是可能存在分支，使得流水线不能正常地高速执行了。为了解决分支的问题，提出了两种方法，一种是分支预测（branch prediction），另一种是分支断定（branch predication）。 </p>
+<p>分支预测就是根据历史记录或基于全局记录来进行预测下一步需要执行哪条命令，然后减少分支的开销。分支预测能达到90%的准确率，但是增加了额外的硬件电路设计上的面积（因为需要记录历史分支数据，需要增加额外的存储器件），也可能会增加延迟。 </p>
+<p>分支断定就是类似与每次都将所有可能的下一条执行尝试一遍，避免了分支预测。可以这样认为：分支断定就像switch语句，每个选项都进行比较，而分支预测就相当于if/else语句，需要使用分支预测器。 </p>
+<p>为了提升IPC（CPI的倒数），CPU又使用了超标量的方法，即增加流水线的宽度，相当于同时执行好几条流水线，这样效率又提高了，当然也是以增加芯片面积为代价的。 </p>
+<h2 id="指令调度">指令调度</h2><p>因为有些指令之间是有依赖关系的，比如A指令是把加的结果写入到R1,B指令是读取R1中的数，所以B指令必须等A指令完成之后才能来执行。一般来讲，Read—After-Write（RAW）模式的语句之间有依赖关系，而别的，像WAW,WAR都是没依赖关系的。<br>为了解决指令依赖的问题，提出了2种方案：1是寄存器重命名，即将涉及冲突的寄存器重命名为不同的寄存器，就解决了依赖问题；2是乱序执行，即将所有指令放到一个重拍缓冲区（ROB，Recorder Buffer）中，根据一定的算法，重新执行各语句，使得各语句之间无依赖关系。 </p>
+<h2 id="缓存机制">缓存机制</h2><p>CPU的缓存机制利用了1.时间临近性和空间临近性。</p>
+<h2 id="CPU内部的并行性">CPU内部的并行性</h2><p>CPU内部也有并行计算，体现在下面3个层次：</p>
+<ol>
+<li>指令级，如超标量就是通过增加流水线达到并行效果。</li>
+<li>数据级，如矢量运算。如下面代码：</li>
+</ol>
+<pre><code class="cpp"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++)
+{
+    C[i] = A[i] + B[i];
+}
+</code></pre>
+<p> 执行的时候可以通过矢量运算，将循环运算并行地计算，如下：</p>
+<pre><code class="cpp">C[<span class="number">0</span>] = A[<span class="number">0</span>] + B[<span class="number">0</span>];
+C[<span class="number">1</span>] = A[<span class="number">1</span>] + B[<span class="number">1</span>];
+C[<span class="number">2</span>] = A[<span class="number">2</span>] + B[<span class="number">2</span>];
+C[<span class="number">3</span>] = A[<span class="number">3</span>] + B[<span class="number">3</span>];
+C[<span class="number">4</span>] = A[<span class="number">4</span>] + B[<span class="number">4</span>];
+</code></pre>
+<ol>
+<li>线程级别的并行。每个CPU有1-2个活动线程。</li>
+</ol>
+<h2 id="多核相关">多核相关</h2><p>CPU多核之间，只共享最后一级缓存。<br>多核之间数据的访问安全等问题，需要有：</p>
+<ol>
+<li>锁</li>
+<li>一致性： 谁的数据是正确的</li>
+<li>同一性： 哪个数据是正确的</li>
+</ol>
+<h2 id="其他">其他</h2><p>尽管在IEEE的规范中，浮点数使用64bit空间来存储，但在CPU中，浮点数的精度是拓展到80bit来计算的，所以CPU中浮点数精度比GPU（64bit）中要高。 </p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/C/">C++</a><a href="/tags/CUDA/">CUDA</a><a href="/tags/GPU/">GPU</a><a href="/tags/并行计算/">并行计算</a><a href="/tags/计算机视觉/">计算机视觉</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://vra.github.io/2015/09/12/gpu-programming-1/" data-title="GPU并行计算和CUDA编程(1)-CPU体系架构概述 | Yunfeng&#39;s Hexo Blog" data-tsina="5582731363" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/09/12/gpu-programming-2/" title="GPU并行计算和CUDA编程(2)-GPU体系架构概述">
+  <strong>上一篇：</strong><br/>
+  <span>
+  GPU并行计算和CUDA编程(2)-GPU体系架构概述</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/07/04/grunt-configure/"  title="初探Grunt">
+ <strong>下一篇：</strong><br/> 
+ <span>初探Grunt
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2015/09/12/gpu-programming-1/" data-title="GPU并行计算和CUDA编程(1)-CPU体系架构概述" data-url="http://vra.github.io/2015/09/12/gpu-programming-1/"></div>
+</section>
+
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一些概念"><span class="toc-number">1.</span> <span class="toc-text">一些概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#流水线存在的一些问题"><span class="toc-number">2.</span> <span class="toc-text">流水线存在的一些问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#指令调度"><span class="toc-number">3.</span> <span class="toc-text">指令调度</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#缓存机制"><span class="toc-number">4.</span> <span class="toc-text">缓存机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CPU内部的并行性"><span class="toc-number">5.</span> <span class="toc-text">CPU内部的并行性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#多核相关"><span class="toc-number">6.</span> <span class="toc-text">多核相关</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他"><span class="toc-number">7.</span> <span class="toc-text">其他</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/学习总结/C/" title="C++">C++<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/OpenCV/" title="OpenCV">OpenCV<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Sublime-Text/" title="Sublime Text">Sublime Text<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/四季风物/" title="四季风物">四季风物<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/" title="学习总结">学习总结<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/我们的记录/" title="我们的记录">我们的记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/朝花夕拾/" title="朝花夕拾">朝花夕拾<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/未分类/" title="未分类">未分类<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/速记/" title="速记">速记<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Linux/" title="Linux">Linux<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C++">C++<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/学习总结/" title="学习总结">学习总结<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/并行计算/" title="并行计算">并行计算<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python/" title="Python">Python<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Caffe/" title="Caffe">Caffe<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Sublime-Text/" title="Sublime Text">Sublime Text<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/GPU/" title="GPU">GPU<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/总结/" title="总结">总结<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web编程/" title="Web编程">Web编程<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CUDA/" title="CUDA">CUDA<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Nvidia/" title="Nvidia">Nvidia<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Shell/" title="Shell">Shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/博客备忘/" title="博客备忘">博客备忘<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/matlab/" title="matlab">matlab<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/asciinema/" title="asciinema">asciinema<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Make/" title="Make">Make<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/机器学习-总结/" title="机器学习 总结">机器学习 总结<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/Apache/" style="font-size: 10px;">Apache</a> <a href="/tags/C/" style="font-size: 20px;">C++</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CUDA/" style="font-size: 12px;">CUDA</a> <a href="/tags/Caffe/" style="font-size: 14px;">Caffe</a> <a href="/tags/Deep-Learning/" style="font-size: 10px;">Deep Learning</a> <a href="/tags/DeepLearning/" style="font-size: 10px;">DeepLearning</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/GPU/" style="font-size: 14px;">GPU</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Make/" style="font-size: 10px;">Make</a> <a href="/tags/Nvidia/" style="font-size: 10px;">Nvidia</a> <a href="/tags/OpenMP/" style="font-size: 10px;">OpenMP</a> <a href="/tags/PIL/" style="font-size: 10px;">PIL</a> <a href="/tags/Python/" style="font-size: 14px;">Python</a> <a href="/tags/Shell/" style="font-size: 10px;">Shell</a> <a href="/tags/Siamese-Network/" style="font-size: 10px;">Siamese Network</a> <a href="/tags/Spark/" style="font-size: 10px;">Spark</a> <a href="/tags/Sublime-Text/" style="font-size: 14px;">Sublime Text</a> <a href="/tags/Web编程/" style="font-size: 12px;">Web编程</a> <a href="/tags/Wordpress/" style="font-size: 10px;">Wordpress</a> <a href="/tags/asciinema/" style="font-size: 10px;">asciinema</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/matlab/" style="font-size: 10px;">matlab</a> <a href="/tags/博客备忘/" style="font-size: 10px;">博客备忘</a> <a href="/tags/图像处理/" style="font-size: 10px;">图像处理</a> <a href="/tags/学习总结/" style="font-size: 18px;">学习总结</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/并行计算/" style="font-size: 16px;">并行计算</a> <a href="/tags/总结/" style="font-size: 12px;">总结</a> <a href="/tags/机器学习-总结/" style="font-size: 10px;">机器学习 总结</a> <a href="/tags/深度学习/" style="font-size: 10px;">深度学习</a> <a href="/tags/计算机视觉/" style="font-size: 12px;">计算机视觉</a> <a href="/tags/速记/" style="font-size: 10px;">速记</a>
+    </div>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://cra.blog.ustc.edu.cn" target="_blank" title="他年得傍蟾宫客">他年得傍蟾宫客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=5582731363&verifier=db8de729&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Yunfeng Wang in USTC <br/>
+			This is my blog, keep thinking, keep working</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/5582731363" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/vra" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		<a href="http://stackoverflow.com/users/2932001" target="_blank" class="icon-stack-overflow" title="stackoverflow"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Yunfeng Wang">Yunfeng Wang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"vra"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'yunfengshexoblog';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255298630'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255298630' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  <!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</body>
+</html>

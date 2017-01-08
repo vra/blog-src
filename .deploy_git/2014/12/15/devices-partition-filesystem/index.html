@@ -1,0 +1,713 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>设备文件,分区和文件系统辨析 | Yunfeng&#39;s Hexo Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Yunfeng Wang">
+    
+
+    
+    <meta name="description" content="在写上一篇博客时,我发现我没搞清楚块设备(block device),分区(partion)和文件系统(filesystem)这几个概念之间的关系,今早查了一些资料才慢慢理解了它们之间的关系,所以我想写出来,看看我能不能将一个问题描述清楚.下面我依次描述设备文件,分区和文件系统这三个概念.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设备文件,分区和文件系统辨析">
+<meta property="og:url" content="http://vra.github.io/2014/12/15/devices-partition-filesystem/index.html">
+<meta property="og:site_name" content="Yunfeng's Hexo Blog">
+<meta property="og:description" content="在写上一篇博客时,我发现我没搞清楚块设备(block device),分区(partion)和文件系统(filesystem)这几个概念之间的关系,今早查了一些资料才慢慢理解了它们之间的关系,所以我想写出来,看看我能不能将一个问题描述清楚.下面我依次描述设备文件,分区和文件系统这三个概念.">
+<meta property="og:image" content="https://vra.blog.ustc.edu.cn/wp-content/uploads/2014/12/filesystem.png">
+<meta property="og:updated_time" content="2017-01-08T09:23:44.722Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="设备文件,分区和文件系统辨析">
+<meta name="twitter:description" content="在写上一篇博客时,我发现我没搞清楚块设备(block device),分区(partion)和文件系统(filesystem)这几个概念之间的关系,今早查了一些资料才慢慢理解了它们之间的关系,所以我想写出来,看看我能不能将一个问题描述清楚.下面我依次描述设备文件,分区和文件系统这三个概念.">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Yunfeng&#39;s Hexo Blog" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/author.jpg">
+    
+    
+    <link rel="apple-touch-icon" href="/img/logo.png">
+    <link rel="apple-touch-icon-precomposed" href="/img/logo.png">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Yunfeng&#39;s Hexo Blog" title="Yunfeng&#39;s Hexo Blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Yunfeng&#39;s Hexo Blog">Yunfeng&#39;s Hexo Blog</a></h1>
+				<h2 class="blog-motto">Life is the process of learning</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					<li>
+						<a href="/atom.xml">RSS</a>
+					</li>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="/search/index.html" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" autocomplete="off" name="q" maxlength="20" placeholder="搜索" />
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/12/15/devices-partition-filesystem/" title="设备文件,分区和文件系统辨析" itemprop="url">设备文件,分区和文件系统辨析</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Yunfeng Wang" target="_blank" itemprop="author">Yunfeng Wang</a>
+		
+  <p class="article-time">
+    <time datetime="2014-12-15T06:57:56.000Z" itemprop="datePublished"> 发表于 2014-12-15</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#设备文件(Device_file)"><span class="toc-number">1.</span> <span class="toc-text">设备文件(Device file)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#字符设备(Character_devices)"><span class="toc-number">1.1.</span> <span class="toc-text">字符设备(Character devices)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#块设备(Block_devices)"><span class="toc-number">1.2.</span> <span class="toc-text">块设备(Block devices)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#伪设备(Pseudo-devices)"><span class="toc-number">1.3.</span> <span class="toc-text">伪设备(Pseudo-devices)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分区(Partition)"><span class="toc-number">2.</span> <span class="toc-text">分区(Partition)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文件系统(Filesystem)"><span class="toc-number">3.</span> <span class="toc-text">文件系统(Filesystem)</span></a></li></ol>
+		
+		</div>
+		
+		<p>在写上一篇博客时,我发现我没搞清楚块设备(block device),分区(partion)和文件系统(filesystem)这几个概念之间的关系,今早查了一些资料才慢慢理解了它们之间的关系,所以我想写出来,看看我能不能将一个问题描述清楚.下面我依次描述设备文件,分区和文件系统这三个概念.</p>
+<a id="more"></a>
+<h2 id="设备文件(Device_file)">设备文件(Device file)</h2><p>在类Unix操作系统中,有”<a href="http://en.wikipedia.org/wiki/Everything_is_a_file" target="_blank" rel="external">一切皆文件(everything is a file)”的思想</a>,当然硬件设备也不例外.在这个思想下,打印机,CD碟片,硬盘,输入输出硬件都被视为一个文件,而这些被视为文件的物理介质就可以称为设备文件.物理介质分为字符设备和块设备,详细的含义见下.除了物理介质,Unix操作系统还有一类设备文件,叫伪设备,这三类设备文件的具体含义是:</p>
+<h3 id="字符设备(Character_devices)">字符设备(Character devices)</h3><p>每次与系统传输数据时,只传输一个字符.没有缓冲区,系统直接从物理设备读取字符.常用于流设备的通信.因为没有缓存,所以只能顺序读取字符,不支持随机读取.像串口和键盘就是字符设备.</p>
+<h3 id="块设备(Block_devices)">块设备(Block devices)</h3><p>与字符设备相反,块设备每次与系统传输数据时,是以块(Block)的方式来传输的.由于以块来读取,所以需要一定读取时间,故常设有缓存区,支持随机读取.常见的块设备有硬盘,CD-ROM驱动器和闪存等.</p>
+<h3 id="伪设备(Pseudo-devices)">伪设备(Pseudo-devices)</h3><p>前面两种设备文件是物理设备,而伪设备则不是,它们通常是为操作系统提供特定的功能而存在的.常见的伪设备有:</p>
+<p><code>/dev/null</code>:接受和丢弃所有输入,即吞下输入,然后什么都不做.</p>
+<p><code>/dev/zero</code>:产生联系的NULL字符串流,用c语言表示就是”\0\0\0\0\0”</p>
+<p><code>/dev/random</code>:产生一个随机的字符串流</p>
+<p><code>/dev/full</code>:模拟一个已经装满了内容的设备</p>
+<p>这些伪设备有什么用呢?在实际中,如果巧妙使用这些伪设备的话,可以提高工作效率,像命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dd <span class="keyword">if</span>=/dev/zero of=testzero count=<span class="number">1024</span> bs=<span class="number">1024</span></span><br></pre></td></tr></table></figure>
+<p>就会创建一个大小为1024的,文件名为testzero的空文件.</p>
+<p>上面就是设备文件的大概内容.在Linux 下,设备文件都在<code>/dev</code>目录下,并且有特定的前缀,可以看看:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> /dev</span><br><span class="line">$ ls</span><br><span class="line"></span><br><span class="line">audio            dvd        loop2            network_throughput  sda5      tty11  tty27  tty42  tty58    v4l         vcsa4</span><br><span class="line">autofs           dvdrw      loop3            null                sda6      tty12  tty28  tty43  tty59    vboxdrv     vcsa5</span><br><span class="line">block            fb0        loop4            port                sdb       tty13  tty29  tty44  tty6     vboxdrvu    vcsa6</span><br><span class="line">bsg              fd         loop5            ppp                 sg0       tty14  tty3   tty45  tty60    vboxnetctl  vcsa7</span><br><span class="line">btrfs-control    full       loop6            psaux               sg1       tty15  tty30  tty46  tty61    vboxusb     vfio</span><br><span class="line">bus              fuse       loop7            ptmx                sg2       tty16  tty31  tty47  tty62    vcs         vga_arbiter</span><br><span class="line">cdrom            gpmctl     loop-control     pts                 shm       tty17  tty32  tty48  tty63    vcs1        vhci</span><br><span class="line">cdrw             hidraw0    mapper           random              snapshot  tty18  tty33  tty49  tty7     vcs2        vhost-net</span><br><span class="line">char             hpet       mcelog           rfkill              snd       tty19  tty34  tty5   tty8     vcs3        video0</span><br><span class="line">console          hugepages  media0           rtc                 sr0       tty2   tty35  tty50  tty9     vcs4        watchdog</span><br><span class="line">core             initctl    mei              rtc0                stderr    tty20  tty36  tty51  ttyS0    vcs5        watchdog0</span><br><span class="line">cpu              input      mem              rts51x0             stdin     tty21  tty37  tty52  ttyS1    vcs6        xconsole</span><br><span class="line">cpu_dma_latency  kmsg       mixer            sda                 stdout    tty22  tty38  tty53  ttyS2    vcs7        zero</span><br><span class="line">cuse             kvm        mixer1           sda1                tty       tty23  tty39  tty54  ttyS3    vcsa</span><br><span class="line">disk             <span class="built_in">log</span>        mqueue           sda2                tty0      tty24  tty4   tty55  uhid     vcsa1</span><br><span class="line">dri              loop0      net              sda3                tty1      tty25  tty40  tty56  uinput   vcsa2</span><br><span class="line">dsp              loop1      network_latency  sda4                tty10     tty26  tty41  tty57  urandom  vcsa3</span><br></pre></td></tr></table></figure>
+<p>可以看到有很多的设备文件,前面提到的<code>/dev/null</code>等伪设备也在里面.</p>
+<p>对特定类型的设备有特定的前缀,如对硬盘,前缀是<code>sd</code>,如<code>sda</code>就是第一块硬盘.对终端设备,前缀是<code>tty</code>.</p>
+<p>像我们的笔记本,一般只有一块硬盘,也就是只有一个块设备,我们可以将所有内容都存在这个设备上,像日志文件,<code>/home</code>下面的文件都平等的存放,谁东西多就多占点空间.</p>
+<p>但这样有个问题,由于日志文件占地方会比较大,如果有一天,将整个设备占满之后,其他文件就没有地方放了,整个系统就没法再正常运转下去了.所有就产生了这种方案:将一块设备划分成好几个部分,比如日志文件放一个部分,<code>/home</code>文件放另一个部分,相互隔离开.如果日志文件占满了,别的空间还能正常使用,所以分区解决了上述问题.</p>
+<p>还有如果你想装双系统,如果不分区,两个操作系统混在一起,可能会发生很多意外,所以分区显得很有必要.</p>
+<h2 id="分区(Partition)">分区(Partition)</h2><p>从上面我们可以看到,分区其实就像把一个硬盘分成了好几份,就跟把一个大蛋糕切成好几块,一人一块一样.其实从前面的/dev目录下的设备文件我们可以看到,<code>sda</code>这个设备被分成了6个分区,分别是<code>sda1</code>,<code>sda2</code>,….<code>sda6</code>.就像有些动物通过撒尿来标记自己领地的边界一样,块设备也有特定的标记分区边界的文件,那就是分区表.分区表就像契约一样,规定了硬盘的前多少个空间分给分区1,后面多少空间分给分区2,等等.可以通过<code>fdisk</code>指令来查看分区详情:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">$ sudo fdisk <span class="operator">-l</span></span><br><span class="line">Disk /dev/sda: <span class="number">750.2</span> GB, <span class="number">750156374016</span> bytes</span><br><span class="line"><span class="number">255</span> heads, <span class="number">63</span> sectors/track, <span class="number">91201</span> cylinders, total <span class="number">1465149168</span> sectors</span><br><span class="line">Units = sectors of <span class="number">1</span> * <span class="number">512</span> = <span class="number">512</span> bytes</span><br><span class="line">Sector size (logical/physical): <span class="number">512</span> bytes / <span class="number">4096</span> bytes</span><br><span class="line">I/O size (minimum/optimal): <span class="number">4096</span> bytes / <span class="number">4096</span> bytes</span><br><span class="line">Disk identifier: <span class="number">0</span>x5be4a3f9</span><br><span class="line"></span><br><span class="line">   Device Boot      Start         End      Blocks   Id  System</span><br><span class="line">/dev/sda1            <span class="number">2048</span>      <span class="number">718847</span>      <span class="number">358400</span>    <span class="number">7</span>  HPFS/NTFS/exFAT</span><br><span class="line">/dev/sda2          <span class="number">718848</span>   <span class="number">409602047</span>   <span class="number">204441600</span>    <span class="number">7</span>  HPFS/NTFS/exFAT</span><br><span class="line">/dev/sda3       <span class="number">409602048</span>   <span class="number">819202047</span>   <span class="number">204800000</span>    <span class="number">7</span>  HPFS/NTFS/exFAT</span><br><span class="line">/dev/sda4      <span class="number">1268469758</span>  <span class="number">1465147391</span>    <span class="number">98338817</span>    <span class="number">5</span>  Extended</span><br><span class="line">Partition <span class="number">4</span> does not start on physical sector boundary.</span><br><span class="line">/dev/sda5      <span class="number">1346594816</span>  <span class="number">1465147391</span>    <span class="number">59276288</span>   <span class="number">83</span>  Linux</span><br><span class="line">/dev/sda6   *  <span class="number">1268469760</span>  <span class="number">1346594815</span>    <span class="number">39062528</span>   <span class="number">83</span>  Linux</span><br><span class="line"></span><br><span class="line">Partition table entries are not <span class="keyword">in</span> disk order</span><br></pre></td></tr></table></figure>
+<p>前面是硬盘的物理信息,如大小,有多少个柱面等等.后面是各个分区的开始位置,结束位置,包含多少个Blocks,系统类型等信息.</p>
+<p>分区完成后,我们就可以在不同的分区上干不同的事情了.我把<code>sda2</code>标记为C盘,把<code>sda3</code>标记为D盘,把Linux的根目录挂载在<code>sda6</code>上,把<code>/home</code>目录挂载在<code>sda5</code>上,大家互相不再干扰,和谐共处.</p>
+<h2 id="文件系统(Filesystem)">文件系统(Filesystem)</h2><p>在Windows下,我们格式化U盘的时候,会让你选择格式化为FAT16,FAT3或者NTFS等,那么这些东西又是什么东西呢?这些东西就是不同的文件系统格式.</p>
+<p>文件系统是一种存储和组织计算机数据的方法,通过文件系统,我们可以使用简单的方式来对物理介质执行操作.比如,没有文件系统,如果我要删除一个文件,那么我就得先找到它在硬盘上的哪个扇区,哪个柱面,然后删除它.有了文件系统,我可以用图形化的界面按<code>Shift</code>+<code>Delete</code>删除.这些简便都是文件系统的功劳.如果说分区这个概念是物理上的概念的话,那么文件系统就是纯粹的逻辑上的概念了.</p>
+<p>不同的系统支持的文件系统不同,</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Windows:FAT16,FAT32,NTFS等</span><br><span class="line">Linux:ext1,ext2,ext3,ext4,NTFS,ISO9660等</span><br><span class="line">Mac OS X:HFS,HFS+</span><br></pre></td></tr></table></figure>
+<p>如何查看各个分区的文件系统呢?可以用<code>blkid</code>命令:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ sudo blkid</span><br><span class="line"></span><br><span class="line">/dev/sda1: LABEL=<span class="string">"M-gM-3M-;M-gM-;M-^_M-dM-?M-^]M-gM-^UM-^Y"</span> UUID=<span class="string">"9ED61632D6160B63"</span> TYPE=<span class="string">"ntfs"</span> PARTUUID=<span class="string">"5be4a3f9-01"</span> </span><br><span class="line">/dev/sda2: UUID=<span class="string">"908265F98265E466"</span> TYPE=<span class="string">"ntfs"</span> PARTUUID=<span class="string">"5be4a3f9-02"</span> </span><br><span class="line">/dev/sda3: UUID=<span class="string">"98B6FE61B6FE3EF6"</span> TYPE=<span class="string">"ntfs"</span> PARTUUID=<span class="string">"5be4a3f9-03"</span> </span><br><span class="line">/dev/sda5: UUID=<span class="string">"7c4b5af9-599b-4052-aeb1-5dbd78f4d8e8"</span> TYPE=<span class="string">"ext4"</span> PARTUUID=<span class="string">"5be4a3f9-05"</span> </span><br><span class="line">/dev/sda6: UUID=<span class="string">"22b1037f-6c5e-46d0-b965-44cc42313795"</span> TYPE=<span class="string">"ext4"</span> PARTUUID=<span class="string">"5be4a3f9-06"</span></span><br></pre></td></tr></table></figure>
+<p>可以看到,<code>/dev/sda1</code>,<code>/dev/sda2</code>和<code>/dev/sda3</code>是ntfs文件系统,<code>/dev/sda5</code>和<code>/dev/sda6</code>是ext4文件系统.(/dev/sda4去哪了呢?…)</p>
+<p>最后用一个图来总结一下:</p>
+<p><img src="https://vra.blog.ustc.edu.cn/wp-content/uploads/2014/12/filesystem.png" alt="filesystem"></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/学习总结/">学习总结</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Linux/">Linux</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://vra.github.io/2014/12/15/devices-partition-filesystem/" data-title="设备文件,分区和文件系统辨析 | Yunfeng&#39;s Hexo Blog" data-tsina="5582731363" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/12/15/test/" title="测试文章">
+  <strong>上一篇：</strong><br/>
+  <span>
+  测试文章</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/12/14/fstab-automount-windows-partitions/"  title="Linux下通过修改fstab来自动挂载Windows 分区">
+ <strong>下一篇：</strong><br/> 
+ <span>Linux下通过修改fstab来自动挂载Windows 分区
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+<section id="comments" class="comment">
+	<div class="ds-thread" data-thread-key="2014/12/15/devices-partition-filesystem/" data-title="设备文件,分区和文件系统辨析" data-url="http://vra.github.io/2014/12/15/devices-partition-filesystem/"></div>
+</section>
+
+
+<section id="comments" class="comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#设备文件(Device_file)"><span class="toc-number">1.</span> <span class="toc-text">设备文件(Device file)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#字符设备(Character_devices)"><span class="toc-number">1.1.</span> <span class="toc-text">字符设备(Character devices)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#块设备(Block_devices)"><span class="toc-number">1.2.</span> <span class="toc-text">块设备(Block devices)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#伪设备(Pseudo-devices)"><span class="toc-number">1.3.</span> <span class="toc-text">伪设备(Pseudo-devices)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#分区(Partition)"><span class="toc-number">2.</span> <span class="toc-text">分区(Partition)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文件系统(Filesystem)"><span class="toc-number">3.</span> <span class="toc-text">文件系统(Filesystem)</span></a></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">分类</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/学习总结/C/" title="C++">C++<sup>4</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/OpenCV/" title="OpenCV">OpenCV<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Sublime-Text/" title="Sublime Text">Sublime Text<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/四季风物/" title="四季风物">四季风物<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/" title="学习总结">学习总结<sup>11</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/我们的记录/" title="我们的记录">我们的记录<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/朝花夕拾/" title="朝花夕拾">朝花夕拾<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/未分类/" title="未分类">未分类<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/学习总结/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/速记/" title="速记">速记<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Linux/" title="Linux">Linux<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/C/" title="C++">C++<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/学习总结/" title="学习总结">学习总结<sup>6</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/并行计算/" title="并行计算">并行计算<sup>4</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Python/" title="Python">Python<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Caffe/" title="Caffe">Caffe<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Sublime-Text/" title="Sublime Text">Sublime Text<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/GPU/" title="GPU">GPU<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/总结/" title="总结">总结<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Web编程/" title="Web编程">Web编程<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/CUDA/" title="CUDA">CUDA<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/计算机视觉/" title="计算机视觉">计算机视觉<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Spark/" title="Spark">Spark<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Nvidia/" title="Nvidia">Nvidia<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Shell/" title="Shell">Shell<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/博客备忘/" title="博客备忘">博客备忘<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/matlab/" title="matlab">matlab<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/asciinema/" title="asciinema">asciinema<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/Make/" title="Make">Make<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/机器学习-总结/" title="机器学习 总结">机器学习 总结<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  
+  <div class="tagcloudlist">
+    <p class="asidetitle">标签云</p>
+    <div class="tagcloudlist clearfix">
+       <a href="/tags/Apache/" style="font-size: 10px;">Apache</a> <a href="/tags/C/" style="font-size: 20px;">C++</a> <a href="/tags/C-C/" style="font-size: 10px;">C/C++</a> <a href="/tags/CUDA/" style="font-size: 12px;">CUDA</a> <a href="/tags/Caffe/" style="font-size: 14px;">Caffe</a> <a href="/tags/Deep-Learning/" style="font-size: 10px;">Deep Learning</a> <a href="/tags/DeepLearning/" style="font-size: 10px;">DeepLearning</a> <a href="/tags/Django/" style="font-size: 10px;">Django</a> <a href="/tags/GPU/" style="font-size: 14px;">GPU</a> <a href="/tags/Linux/" style="font-size: 20px;">Linux</a> <a href="/tags/Make/" style="font-size: 10px;">Make</a> <a href="/tags/Nvidia/" style="font-size: 10px;">Nvidia</a> <a href="/tags/OpenMP/" style="font-size: 10px;">OpenMP</a> <a href="/tags/PIL/" style="font-size: 10px;">PIL</a> <a href="/tags/Python/" style="font-size: 14px;">Python</a> <a href="/tags/Shell/" style="font-size: 10px;">Shell</a> <a href="/tags/Siamese-Network/" style="font-size: 10px;">Siamese Network</a> <a href="/tags/Spark/" style="font-size: 10px;">Spark</a> <a href="/tags/Sublime-Text/" style="font-size: 14px;">Sublime Text</a> <a href="/tags/Web编程/" style="font-size: 12px;">Web编程</a> <a href="/tags/Wordpress/" style="font-size: 10px;">Wordpress</a> <a href="/tags/asciinema/" style="font-size: 10px;">asciinema</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/matlab/" style="font-size: 10px;">matlab</a> <a href="/tags/博客备忘/" style="font-size: 10px;">博客备忘</a> <a href="/tags/图像处理/" style="font-size: 10px;">图像处理</a> <a href="/tags/学习总结/" style="font-size: 18px;">学习总结</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/并行计算/" style="font-size: 16px;">并行计算</a> <a href="/tags/总结/" style="font-size: 12px;">总结</a> <a href="/tags/机器学习-总结/" style="font-size: 10px;">机器学习 总结</a> <a href="/tags/深度学习/" style="font-size: 10px;">深度学习</a> <a href="/tags/计算机视觉/" style="font-size: 12px;">计算机视觉</a> <a href="/tags/速记/" style="font-size: 10px;">速记</a>
+    </div>
+  </div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">友情链接</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://cra.blog.ustc.edu.cn" target="_blank" title="他年得傍蟾宫客">他年得傍蟾宫客</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+  <div class="weiboshow">
+  <p class="asidetitle">新浪微博</p>
+    <iframe width="100%" height="119" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=119&fansRow=2&ptype=1&speed=0&skin=9&isTitle=1&noborder=1&isWeibo=0&isFans=0&uid=5582731363&verifier=db8de729&dpc=1"></iframe>
+</div>
+
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> Hello ,I&#39;m Yunfeng Wang in USTC <br/>
+			This is my blog, keep thinking, keep working</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		<a href="http://weibo.com/5582731363" target="_blank" class="icon-weibo" title="微博"></a>
+		
+		
+		<a href="https://github.com/vra" target="_blank" class="icon-github" title="github"></a>
+		
+		
+		<a href="http://stackoverflow.com/users/2932001" target="_blank" class="icon-stack-overflow" title="stackoverflow"></a>
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2017 
+		
+		<a href="/about" target="_blank" title="Yunfeng Wang">Yunfeng Wang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+<script type="text/javascript">
+  var duoshuoQuery = {short_name:"vra"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+</script> 
+
+
+<script type="text/javascript">
+
+var disqus_shortname = 'yunfengshexoblog';
+
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+(function(){
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1255298630'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s23.cnzz.com/z_stat.php%3Fid%3D1255298630' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+
+  <!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</body>
+</html>
